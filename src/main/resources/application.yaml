@@ -9,5 +9,18 @@ spring:
     hibernate:
       ddl-auto: validate
 
+  datasource:
+    primary:
+      url: jdbc:postgresql://${PRIMARY_HOST:postgres-primary}:${PRIMARY_PORT:5432}/${PRIMARY_DB:app_db}
+      username: ${PRIMARY_USER:postgres}
+      password: ${PRIMARY_PASSWORD:primary_password}
+      driver-class-name: org.postgresql.Driver
+
   flyway:
     enabled: false
+    placeholders:
+      timescaleHost: ${TIMESCALE_HOST:timescaledb}
+      timescalePort: ${TIMESCALE_PORT:5432}
+      timescaleDb: ${TIMESCALE_DB:telemetry_db}
+      timescaleUser: ${TIMESCALE_USER:ts_user}
+      timescalePassword: ${TIMESCALE_PASSWORD:ts_password}
