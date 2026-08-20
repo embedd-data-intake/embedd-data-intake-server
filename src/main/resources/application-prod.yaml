@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    primary:
+      url: jdbc:postgresql://localhost:5432/app_db
+      username: postgres
+      password: primary_password
+      driver-class-name: org.postgresql.Driver
+    timescale:
+      url: jdbc:postgresql://localhost:5433/telemetry_db
+      username: ts_user
+      password: ts_password
+      driver-class-name: org.postgresql.Driver

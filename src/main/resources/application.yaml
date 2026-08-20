@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: embedd-data-intake-server
+
+  profiles:
+    active: local
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: false
