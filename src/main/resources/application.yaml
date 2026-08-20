@@ -23,3 +23,7 @@ spring:
       timescaleDb: ${TIMESCALE_DB:telemetry_db}
       timescaleUser: ${TIMESCALE_USER:ts_user}
       timescalePassword: ${TIMESCALE_PASSWORD:ts_password}
+
+jwt:
+  secret: todo
+  expiration-ms: 86400000
