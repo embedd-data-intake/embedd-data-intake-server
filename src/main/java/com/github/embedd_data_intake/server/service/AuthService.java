@@ -8,7 +8,6 @@ import com.github.embedd_data_intake.server.model.RefreshToken;
 import com.github.embedd_data_intake.server.model.User;
 import com.github.embedd_data_intake.server.model.UserEmail;
 import com.github.embedd_data_intake.server.repository.EmailRepository;
-import com.github.embedd_data_intake.server.repository.RefreshTokenRepository;
 import com.github.embedd_data_intake.server.repository.UserEmailRepository;
 import com.github.embedd_data_intake.server.repository.UserRepository;
 import jakarta.transaction.Transactional;
