@@ -22,7 +22,7 @@ public class Email {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    @Column(name = "email_address", nullable = false, length = 255)
+    @Column(name = "email_address", unique = true, nullable = false, length = 255)
     private String emailAddress;
 
     @CreationTimestamp

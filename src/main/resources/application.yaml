@@ -26,4 +26,5 @@ spring:
 
 jwt:
   secret: todo
-  expiration-ms: 86400000
+  access-expiration-days: 1
+  refresh-expiration-days: 30

@@ -6,7 +6,7 @@ CREATE TABLE users (
 
 CREATE TABLE emails (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email_address VARCHAR(255) NOT NULL,
+    email_address VARCHAR(255) NOT NULL UNIQUE,
     created_at TIMESTAMPZ DEFAULT NOW()
 );
 
@@ -19,7 +19,7 @@ CREATE TABLE devices (
 CREATE TABLE refresh_tokens (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    token VARCHAR(255) NOT NULL UNIQUE,
+    token UUID NOT NULL UNIQUE,
     expires_at TIMESTAMPZ NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );

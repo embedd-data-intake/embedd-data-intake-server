@@ -25,7 +25,7 @@ public class RefreshToken {
     private User user;
 
     @Column(name = "token", nullable = false, unique = true)
-    private String token;
+    private UUID token;
 
     @Column(name = "expires_at", nullable = false)
     private OffsetDateTime expiresAt;

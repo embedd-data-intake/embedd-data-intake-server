@@ -14,7 +14,7 @@ import java.util.UUID;
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID> {
 
     @EntityGraph(attributePaths = {"user"})
-    Optional<RefreshToken> findByToken(String token);
+    Optional<RefreshToken> findByToken(UUID token);
 
     List<RefreshToken> findByUserId(UUID userId);
 

@@ -22,4 +22,7 @@ public interface UserEmailRepository extends JpaRepository<UserEmail, UUID> {
 
     // Calling delete triggers the @SQLDelete soft-delete annotation
     void deleteByUserIdAndEmail_Id(UUID userId, UUID emailId);
+
+    // Checks if an active user_email record exists for this email address
+    boolean existsByEmail_EmailAddress(String emailAddress);
 }
