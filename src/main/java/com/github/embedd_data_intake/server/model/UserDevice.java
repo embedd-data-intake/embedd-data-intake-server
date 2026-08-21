@@ -3,12 +3,16 @@ package com.github.embedd_data_intake.server.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "user_device")
+@SQLRestriction("deleted_at is NULL")
+@SQLDelete(sql = "UPDATE user_device SET deleted_at = NOW() WHERE id = ?")
 @Getter
 @Setter
 @NoArgsConstructor
