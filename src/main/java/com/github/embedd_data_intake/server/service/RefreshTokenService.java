@@ -46,4 +46,12 @@ public class RefreshTokenService {
         }
         return refreshToken;
     }
+
+    public void invalidateToken(UUID token) {
+        refreshTokenRepository.deleteByToken(token);
+    }
+
+    public void invalidateAllTokens(UUID userId) {
+        refreshTokenRepository.deleteByUserId(userId);
+    }
 }

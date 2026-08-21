@@ -1,6 +1,7 @@
 package com.github.embedd_data_intake.server.service;
 
 import com.github.embedd_data_intake.server.dto.AuthTokensDto;
+import com.github.embedd_data_intake.server.exceptions.ConflictException;
 import com.github.embedd_data_intake.server.exceptions.UnauthorizedException;
 import com.github.embedd_data_intake.server.model.Email;
 import com.github.embedd_data_intake.server.model.RefreshToken;
@@ -21,16 +22,21 @@ public class AuthService {
     private final UserRepository userRepository;
     private final EmailRepository emailRepository;
     private final UserEmailRepository userEmailRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
 
-    public AuthService(UserRepository userRepository, EmailRepository emailRepository, UserEmailRepository userEmailRepository, RefreshTokenRepository refreshTokenRepository, PasswordEncoder passwordEncoder, JwtService jwtService, RefreshTokenService refreshTokenService) {
+    public AuthService(
+            UserRepository userRepository,
+            EmailRepository emailRepository,
+            UserEmailRepository userEmailRepository,
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService,
+            RefreshTokenService refreshTokenService
+    ) {
         this.userRepository = userRepository;
         this.emailRepository = emailRepository;
         this.userEmailRepository = userEmailRepository;
-        this.refreshTokenRepository = refreshTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
@@ -41,7 +47,7 @@ public class AuthService {
         String emailAddress = rawEmailAddress.trim().toLowerCase();
 
         if (userEmailRepository.existsByEmail_EmailAddress(emailAddress)) {
-            // Throw conflict
+            throw new ConflictException("Email address is already in use.");
         }
 
         User user = new User();
@@ -79,19 +85,21 @@ public class AuthService {
     }
 
     @Transactional
-    public AuthTokensDto refresh(UUID refreshTokenValue) {
-        RefreshToken tokenRecord = refreshTokenService.verifyExpiration(refreshTokenValue);
-
+    public AuthTokensDto refresh(UUID refreshToken) {
+        RefreshToken tokenRecord = refreshTokenService.verifyExpiration(refreshToken);
         User user = tokenRecord.getUser();
-
-        // Fetch active email for token claims
-        UserEmail activeUserEmail = user.getUserEmails().stream()
-                .filter(ue -> ue.getDeletedAt() == null)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("User has no active email"));
-
         String newAccessToken = jwtService.generateAccessToken(user.getId());
 
-        return new AuthTokensDto(newAccessToken, refreshTokenValue);
+        return new AuthTokensDto(newAccessToken, refreshToken);
+    }
+
+    @Transactional
+    public void logout(UUID refreshToken) {
+        refreshTokenService.invalidateToken(refreshToken);
+    }
+
+    @Transactional
+    public void logoutAll(UUID userId) {
+        refreshTokenService.invalidateAllTokens(userId);
     }
 }
