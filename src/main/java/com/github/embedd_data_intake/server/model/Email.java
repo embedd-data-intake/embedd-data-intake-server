@@ -29,7 +29,7 @@ public class Email {
     @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;
 
-    @OneToMany(mappedBy = "emails", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "email", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<UserEmail> userEmails = new ArrayList<>();
 }

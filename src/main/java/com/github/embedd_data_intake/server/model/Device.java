@@ -29,7 +29,7 @@ public class Device {
     @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;
 
-    @OneToMany(mappedBy = "devices", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "device", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<UserDevice> userDevices = new ArrayList<>();
 }

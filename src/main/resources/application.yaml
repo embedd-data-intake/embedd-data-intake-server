@@ -10,13 +10,13 @@ spring:
       ddl-auto: validate
 
   datasource:
-    url: jdbc:postgresql://${PRIMARY_HOST:postgres-primary}:${PRIMARY_PORT:5432}/${PRIMARY_DB:app_db}
-    username: ${PRIMARY_USER:postgres}
-    password: ${PRIMARY_PASSWORD:primary_password}
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${PRIMARY_DB_HOST:postgres-primary}:${PRIMARY_DB_PORT:5432}/${PRIMARY_DB_NAME:app_db}
+    username: ${PRIMARY_DB_USER:postgres}
+    password: ${PRIMARY_DB_PASSWORD:primary_password}
 
   flyway:
-    enabled: false
+    enabled: true
+
     placeholders:
       timescaleHost: ${TIMESCALE_HOST:timescaledb}
       timescalePort: ${TIMESCALE_PORT:5432}
@@ -25,6 +25,6 @@ spring:
       timescalePassword: ${TIMESCALE_PASSWORD:ts_password}
 
 jwt:
-  secret: todo
+  secret: LXO5RFDD1EQ2C4ROW7FZIBJ6PMPHU1L0OF86QFGLYP27CY92D2B7F88IVSMWEDLJR23M6ZFA1Y972XQA9JTIQ1RNWDTTJC8638PUOY3RIO4TDEA2U1TMVLDGCW07I28F
   access-expiration-days: 1
   refresh-expiration-days: 30

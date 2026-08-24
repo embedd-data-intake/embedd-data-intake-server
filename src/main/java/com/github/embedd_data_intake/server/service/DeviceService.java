@@ -8,11 +8,13 @@ import com.github.embedd_data_intake.server.model.UserDevice;
 import com.github.embedd_data_intake.server.repository.DeviceRepository;
 import com.github.embedd_data_intake.server.repository.UserDeviceRepository;
 import com.github.embedd_data_intake.server.repository.UserRepository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
+@Service
 public class DeviceService {
     private final UserRepository userRepository;
     private final DeviceRepository deviceRepository;
