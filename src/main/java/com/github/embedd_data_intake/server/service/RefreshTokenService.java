@@ -41,7 +41,8 @@ public class RefreshTokenService {
 
     @Transactional
     public RefreshToken verifyExpiration(UUID token) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token).orElseThrow();
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
+                .orElseThrow(() -> new UnauthorizedException("Refresh token expired. Please sign in again."));
 
         if (refreshToken.getExpiresAt().isBefore(OffsetDateTime.now())) {
             refreshTokenRepository.delete(refreshToken);
