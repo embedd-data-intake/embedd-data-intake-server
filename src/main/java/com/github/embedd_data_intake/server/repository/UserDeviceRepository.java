@@ -1,10 +1,8 @@
 package com.github.embedd_data_intake.server.repository;
 
-import com.github.embedd_data_intake.server.enums.DeviceRole;
 import com.github.embedd_data_intake.server.model.UserDevice;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
