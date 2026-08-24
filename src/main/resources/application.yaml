@@ -2,15 +2,12 @@ spring:
   application:
     name: embedd-data-intake-server
 
-  profiles:
-    active: local
-
   jpa:
     hibernate:
       ddl-auto: validate
 
   datasource:
-    url: jdbc:postgresql://${PRIMARY_DB_HOST:postgres-primary}:${PRIMARY_DB_PORT:5432}/${PRIMARY_DB_NAME:app_db}
+    url: jdbc:postgresql://${PRIMARY_DB_HOST:localhost}:${PRIMARY_DB_PORT:5432}/${PRIMARY_DB_NAME:app_db}
     username: ${PRIMARY_DB_USER:postgres}
     password: ${PRIMARY_DB_PASSWORD:primary_password}
 
@@ -18,8 +15,8 @@ spring:
     enabled: true
 
     placeholders:
-      timescaleHost: ${TIMESCALE_HOST:timescaledb}
-      timescalePort: ${TIMESCALE_PORT:5432}
+      timescaleHost: ${TIMESCALE_HOST:localhost}
+      timescalePort: ${TIMESCALE_PORT:5433}
       timescaleDb: ${TIMESCALE_DB:telemetry_db}
       timescaleUser: ${TIMESCALE_USER:ts_user}
       timescalePassword: ${TIMESCALE_PASSWORD:ts_password}
