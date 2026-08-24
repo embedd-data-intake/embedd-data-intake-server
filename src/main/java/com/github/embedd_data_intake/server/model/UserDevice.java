@@ -1,5 +1,6 @@
 package com.github.embedd_data_intake.server.model;
 
+import com.github.embedd_data_intake.server.enums.DeviceRole;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -19,7 +20,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class UserDevice {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
@@ -32,6 +32,10 @@ public class UserDevice {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "device_id", nullable = false)
     private Device device;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 30)
+    private DeviceRole role;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

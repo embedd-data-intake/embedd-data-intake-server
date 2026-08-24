@@ -7,6 +7,7 @@ import com.github.embedd_data_intake.server.repository.RefreshTokenRepository;
 import com.github.embedd_data_intake.server.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -26,6 +27,7 @@ public class RefreshTokenService {
         this.expirationDays = expirationDays;
     }
 
+    @Transactional
     public RefreshToken createRefreshToken(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow();
 
@@ -37,6 +39,7 @@ public class RefreshTokenService {
         return refreshTokenRepository.save(refreshToken);
     }
 
+    @Transactional
     public RefreshToken verifyExpiration(UUID token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token).orElseThrow();
 
@@ -47,10 +50,12 @@ public class RefreshTokenService {
         return refreshToken;
     }
 
+    @Transactional
     public void invalidateToken(UUID token) {
         refreshTokenRepository.deleteByToken(token);
     }
 
+    @Transactional
     public void invalidateAllTokens(UUID userId) {
         refreshTokenRepository.deleteByUserId(userId);
     }

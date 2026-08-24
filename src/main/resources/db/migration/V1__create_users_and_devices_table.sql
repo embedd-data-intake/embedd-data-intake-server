@@ -36,6 +36,7 @@ CREATE TABLE user_device (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     device_id UUID NOT NULL REFERENCES devices(id) ON DELETE CASCADE,
+    role VARCHAR(30) NOT NULL DEFAULT 'OWNER',
     created_at TIMESTAMPZ DEFAULT NOW(),
     deleted_at TIMESTAMPZ DEFAULT NULL
 );

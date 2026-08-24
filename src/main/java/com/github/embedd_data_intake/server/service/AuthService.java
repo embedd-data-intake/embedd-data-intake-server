@@ -10,9 +10,9 @@ import com.github.embedd_data_intake.server.model.UserEmail;
 import com.github.embedd_data_intake.server.repository.EmailRepository;
 import com.github.embedd_data_intake.server.repository.UserEmailRepository;
 import com.github.embedd_data_intake.server.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
