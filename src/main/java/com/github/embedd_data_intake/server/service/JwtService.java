@@ -1,6 +1,5 @@
 package com.github.embedd_data_intake.server.service;
 
-import com.github.embedd_data_intake.server.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
