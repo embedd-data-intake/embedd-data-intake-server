@@ -18,6 +18,11 @@ public class UserService {
         this.userDeviceRepository = userDeviceRepository;
     }
 
+    /**
+     * @param userId for which to find the devices
+     * @param role (optional) to filter devices by roles
+     * @return list of device ids and the role the user has with them
+     */
     public List<DeviceRoleDto> getUserDevices(UUID userId, DeviceRole role) {
         List<UserDevice> userDevices;
         if (Objects.isNull(role)) {
