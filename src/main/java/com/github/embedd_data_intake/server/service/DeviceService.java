@@ -35,7 +35,7 @@ public class DeviceService {
                 .orElseThrow(() -> new IllegalArgumentException("Device not found"));
 
         // Check if mapping exists, update or create new
-        UserDevice userDevice = userDeviceRepository.findByUserAndDevice_Id(targetUser.getId(), deviceId)
+        UserDevice userDevice = userDeviceRepository.findByUserIdAndDevice_Id(targetUser.getId(), deviceId)
                 .orElseGet(() -> {
                     UserDevice ud = new UserDevice();
                     ud.setUser(targetUser);
@@ -56,7 +56,7 @@ public class DeviceService {
         Device device = deviceRepository.findById(deviceId)
                 .orElseThrow(() -> new NotFoundException("Device not found"));
 
-        UserDevice userDevice = userDeviceRepository.findByUserAndDevice_Id(targetUser.getId(), deviceId)
+        UserDevice userDevice = userDeviceRepository.findByUserIdAndDevice_Id(targetUser.getId(), deviceId)
                 .orElseThrow(() -> new NotFoundException("User does not have access to the device"));
 
         userDevice.setDeletedAt(OffsetDateTime.now());
@@ -66,5 +66,23 @@ public class DeviceService {
     public Object getTelemetry(UUID deviceId) {
         // TODO: Connect to the TimescaleDB
         throw new RuntimeException("Not yet implemented");
+    }
+
+    @Transactional
+    public UUID addDevice(UUID ownerId, String deviceName) {
+        Device device = new Device();
+        device.setDeviceName(deviceName);
+        deviceRepository.save(device);
+
+        User user = userRepository.findById(ownerId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        UserDevice userDevice = new UserDevice();
+        userDevice.setUser(user);
+        userDevice.setDevice(device);
+        userDevice.setRole(DeviceRole.OWNER);
+        userDeviceRepository.save(userDevice);
+
+        return device.getId();
     }
 }

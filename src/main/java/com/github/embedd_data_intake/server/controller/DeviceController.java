@@ -1,11 +1,15 @@
 package com.github.embedd_data_intake.server.controller;
 
+import com.github.embedd_data_intake.server.dto.AddDeviceDto;
 import com.github.embedd_data_intake.server.dto.ShareRequestDto;
 import com.github.embedd_data_intake.server.service.DeviceService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.UUID;
 
 @RestController
@@ -15,6 +19,18 @@ public class DeviceController {
 
     public DeviceController(DeviceService deviceService) {
         this.deviceService = deviceService;
+    }
+
+    @PostMapping
+    public ResponseEntity<?> addDevice(@AuthenticationPrincipal UUID ownerId, @RequestBody AddDeviceDto device) {
+        UUID deviceId = deviceService.addDevice(ownerId, device.getDeviceName());
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{deviceId}")
+                .buildAndExpand(deviceId)
+                .toUri();
+
+        return ResponseEntity.created(location).build();
     }
 
     @GetMapping("{deviceId}/telemetry")

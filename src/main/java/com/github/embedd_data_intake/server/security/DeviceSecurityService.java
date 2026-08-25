@@ -24,10 +24,10 @@ public class DeviceSecurityService {
             return false;
         }
 
-        UUID currentUserId = UUID.fromString((String) Objects.requireNonNull(auth.getPrincipal()));
+        UUID currentUserId = (UUID) auth.getPrincipal();
         DeviceRole requiredRole = DeviceRole.valueOf(requiredRoleName);
 
-        return userDeviceRepository.findByUserAndDevice_Id(currentUserId, deviceId)
+        return userDeviceRepository.findByUserIdAndDevice_Id(currentUserId, deviceId)
                 .map(role -> role.getRole().hasPermission(requiredRole))
                 .orElse(false);
     }
