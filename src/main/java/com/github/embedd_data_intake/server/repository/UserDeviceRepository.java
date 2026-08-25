@@ -1,5 +1,6 @@
 package com.github.embedd_data_intake.server.repository;
 
+import com.github.embedd_data_intake.server.enums.DeviceRole;
 import com.github.embedd_data_intake.server.model.UserDevice;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +14,9 @@ import java.util.UUID;
 public interface UserDeviceRepository extends JpaRepository<UserDevice, UUID> {
     @EntityGraph(attributePaths = {"device"})
     List<UserDevice> findByUserId(UUID userId);
+
+    @EntityGraph(attributePaths = {"device"})
+    List<UserDevice> findByUserIdAndRole(UUID userId, DeviceRole role);
 
     Optional<UserDevice> findByUserAndDevice_Id(UUID userId, UUID deviceId);
 
