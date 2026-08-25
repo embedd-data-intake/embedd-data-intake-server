@@ -37,6 +37,7 @@ public class DeviceSecurityService {
         UUID currentUserId = (UUID) auth.getPrincipal();
         DeviceRole requiredRole = DeviceRole.valueOf(requiredRoleName);
 
+        // Get the active user-device relationship and check the role of the user for the respective device
         return userDeviceRepository.findByUserIdAndDevice_Id(currentUserId, deviceId)
                 .map(role -> role.getRole().hasPermission(requiredRole))
                 .orElseThrow(() -> new NotFoundException("Device not found."));
