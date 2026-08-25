@@ -1,19 +1,23 @@
 package com.github.embedd_data_intake.server.service;
 
 import com.github.embedd_data_intake.server.dto.DeviceDto;
+import com.github.embedd_data_intake.server.dto.UserRoleDto;
 import com.github.embedd_data_intake.server.enums.DeviceRole;
 import com.github.embedd_data_intake.server.exceptions.BadRequestException;
 import com.github.embedd_data_intake.server.exceptions.NotFoundException;
 import com.github.embedd_data_intake.server.model.Device;
+import com.github.embedd_data_intake.server.model.Email;
 import com.github.embedd_data_intake.server.model.User;
 import com.github.embedd_data_intake.server.model.UserDevice;
 import com.github.embedd_data_intake.server.repository.DeviceRepository;
+import com.github.embedd_data_intake.server.repository.EmailRepository;
 import com.github.embedd_data_intake.server.repository.UserDeviceRepository;
 import com.github.embedd_data_intake.server.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -22,11 +26,13 @@ public class DeviceService {
     private final UserRepository userRepository;
     private final DeviceRepository deviceRepository;
     private final UserDeviceRepository userDeviceRepository;
+    private final EmailRepository emailRepository;
 
-    public DeviceService(UserRepository userRepository, DeviceRepository deviceRepository, UserDeviceRepository userDeviceRepository) {
+    public DeviceService(UserRepository userRepository, DeviceRepository deviceRepository, UserDeviceRepository userDeviceRepository, EmailRepository emailRepository) {
         this.userRepository = userRepository;
         this.deviceRepository = deviceRepository;
         this.userDeviceRepository = userDeviceRepository;
+        this.emailRepository = emailRepository;
     }
 
     /**
@@ -53,6 +59,7 @@ public class DeviceService {
                 });
 
         // TODO: Add check/handling if user wants to add an owner
+        // TODO: Add recipient confirmation
 
         userDevice.setRole(role);
         userDevice.setDeletedAt(null); // Restore if soft-deleted previously
@@ -118,5 +125,16 @@ public class DeviceService {
                 .orElseThrow(() -> new NotFoundException("Device not found."));
 
         return new DeviceDto(device.getId(), device.getDeviceName());
+    }
+
+    public List<UserRoleDto> getDeviceAccess(UUID deviceId, DeviceRole role) {
+        List<UserRoleDto> userRoles;
+        if (Objects.isNull(role)) {
+            userRoles = emailRepository.findActiveUserEmailsForDevice(deviceId);
+        } else {
+            userRoles = emailRepository.findActiveUserEmailsForDeviceAndRole(deviceId, role);
+        }
+
+        return userRoles;
     }
 }

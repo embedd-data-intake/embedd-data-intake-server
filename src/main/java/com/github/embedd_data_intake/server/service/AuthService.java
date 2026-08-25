@@ -60,6 +60,8 @@ public class AuthService {
                     return emailRepository.save(newEmail);
                 });
 
+        // TODO: Add email confirmation
+
         UserEmail userEmail = new UserEmail();
         userEmail.setUser(user);
         userEmail.setEmail(email);

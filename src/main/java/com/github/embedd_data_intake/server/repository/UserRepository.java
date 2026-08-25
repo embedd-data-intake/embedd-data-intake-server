@@ -18,9 +18,9 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     // Eagerly fetches active devices to prevent N+1 queries
     @EntityGraph(attributePaths = {"userDevices", "userDevices.device"})
-    Optional<User> findWithDevicesById(UUID id);
+    Optional<User> findWithDevicesById(UUID deviceId);
 
     // Eagerly fetches active emails to prevent N+1 queries
     @EntityGraph(attributePaths = {"userEmails", "userEmails.email"})
-    Optional<User> findWithEmailsById(UUID id);
+    Optional<User> findWithEmailsById(UUID emailId);
 }

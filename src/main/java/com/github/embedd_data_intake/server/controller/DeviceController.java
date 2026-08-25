@@ -3,6 +3,8 @@ package com.github.embedd_data_intake.server.controller;
 import com.github.embedd_data_intake.server.dto.AddDeviceDto;
 import com.github.embedd_data_intake.server.dto.DeviceDto;
 import com.github.embedd_data_intake.server.dto.ShareRequestDto;
+import com.github.embedd_data_intake.server.dto.UserRoleDto;
+import com.github.embedd_data_intake.server.enums.DeviceRole;
 import com.github.embedd_data_intake.server.service.DeviceService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -38,6 +41,12 @@ public class DeviceController {
     @PreAuthorize("@deviceSecurity.hasPermission(#deviceId, 'READ')")
     public ResponseEntity<DeviceDto> getDevice(@PathVariable UUID deviceId) {
         return ResponseEntity.ok(deviceService.getDevice(deviceId));
+    }
+
+    @GetMapping("/{deviceId}/access")
+    @PreAuthorize("@deviceSecurity.hasPermission(#deviceId, 'ADMIN')")
+    public ResponseEntity<List<UserRoleDto>> getDeviceAccess(@PathVariable UUID deviceId, @RequestParam(name = "role", required = false) DeviceRole role) {
+        return ResponseEntity.ok(deviceService.getDeviceAccess(deviceId, role));
     }
 
     @GetMapping("{deviceId}/telemetry")

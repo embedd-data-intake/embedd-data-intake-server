@@ -21,4 +21,10 @@ public interface UserDeviceRepository extends JpaRepository<UserDevice, UUID> {
     Optional<UserDevice> findByUserIdAndDevice_Id(UUID userId, UUID deviceId);
 
     void deleteByUserIdAndDevice_Id(UUID userId, UUID deviceId);
+
+    @EntityGraph(attributePaths = {"device"})
+    List<UserDevice> findByDeviceId(UUID deviceId);
+
+    @EntityGraph(attributePaths = {"device"})
+    List<UserDevice> findByDeviceIdAndRole(UUID deviceId, DeviceRole role);
 }
