@@ -1,6 +1,7 @@
 package com.github.embedd_data_intake.server.controller;
 
 import com.github.embedd_data_intake.server.dto.AddDeviceDto;
+import com.github.embedd_data_intake.server.dto.DeviceDto;
 import com.github.embedd_data_intake.server.dto.ShareRequestDto;
 import com.github.embedd_data_intake.server.service.DeviceService;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,12 @@ public class DeviceController {
                 .toUri();
 
         return ResponseEntity.created(location).build();
+    }
+
+    @GetMapping("/{deviceId}")
+    @PreAuthorize("@deviceSecurity.hasPermission(#deviceId, 'READ')")
+    public ResponseEntity<DeviceDto> getDevice(@PathVariable UUID deviceId) {
+        return ResponseEntity.ok(deviceService.getDevice(deviceId));
     }
 
     @GetMapping("{deviceId}/telemetry")

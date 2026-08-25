@@ -1,5 +1,6 @@
 package com.github.embedd_data_intake.server.service;
 
+import com.github.embedd_data_intake.server.dto.DeviceDto;
 import com.github.embedd_data_intake.server.enums.DeviceRole;
 import com.github.embedd_data_intake.server.exceptions.NotFoundException;
 import com.github.embedd_data_intake.server.model.Device;
@@ -84,5 +85,12 @@ public class DeviceService {
         userDeviceRepository.save(userDevice);
 
         return device.getId();
+    }
+
+    public DeviceDto getDevice(UUID deviceId) {
+        Device device = deviceRepository.findById(deviceId)
+                .orElseThrow(() -> new NotFoundException("Device not found."));
+
+        return new DeviceDto(device.getId(), device.getDeviceName());
     }
 }
