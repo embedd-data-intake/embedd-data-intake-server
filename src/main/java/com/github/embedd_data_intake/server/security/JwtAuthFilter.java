@@ -8,6 +8,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.SneakyThrows;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -49,7 +50,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) throws ServletException {
         String path = request.getServletPath();
         if (EXPLICIT_FILTERS.stream().anyMatch(filter -> filter.test(path))) {
             return false;
@@ -59,17 +60,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             // Find the handler mapping for the current request
             HandlerExecutionChain handlerChain = handlerMapping.getHandler(request);
 
-            if (handlerChain != null && handlerChain.getHandler() instanceof HandlerMethod) {
-                HandlerMethod handlerMethod = (HandlerMethod) handlerChain.getHandler();
-
+            if (handlerChain != null && handlerChain.getHandler() instanceof HandlerMethod handlerMethod) {
                 // Check if annotation exists on the method OR on the class (controller)
                 boolean hasMethodAnnotation = handlerMethod.hasMethodAnnotation(ApplyAuth.class);
                 boolean hasClassAnnotation = handlerMethod.getBeanType().isAnnotationPresent(ApplyAuth.class);
 
+                // Apply doFilterInternal
                 if (hasMethodAnnotation || hasClassAnnotation) {
                     return false;
                 }
             }
+        } catch (ServletException _) {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -88,15 +89,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
 
             String token = authHeader.substring(7);
-
             UUID sid = jwtService.extractSessionId(token);
 
+            // Check if refresh token id is valid and present in the db
             if (Objects.isNull(sid) || !refreshTokenRepository.existsById(sid)) {
                 throw new UnauthorizedException("Invalid or expired access token.");
             }
 
             UUID userId = jwtService.extractUserId(token);
-
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
 
@@ -104,7 +104,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authToken);
 
             filterChain.doFilter(request, response);
-
         } catch (Exception e) {
             UnauthorizedException unauthorizedEx = (e instanceof UnauthorizedException)
                     ? (UnauthorizedException) e
