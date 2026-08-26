@@ -2,6 +2,13 @@ spring:
   application:
     name: embedd-data-intake-server
 
+  mvc:
+    throw-exception-if-no-handler-found: true
+
+  web:
+    resources:
+      add-mappings: false
+
   jpa:
     hibernate:
       ddl-auto: validate
@@ -20,6 +27,12 @@ spring:
       timescaleDb: ${TIMESCALE_DB:telemetry_db}
       timescaleUser: ${TIMESCALE_USER:ts_user}
       timescalePassword: ${TIMESCALE_PASSWORD:ts_password}
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
 
 jwt:
   secret: LXO5RFDD1EQ2C4ROW7FZIBJ6PMPHU1L0OF86QFGLYP27CY92D2B7F88IVSMWEDLJR23M6ZFA1Y972XQA9JTIQ1RNWDTTJC8638PUOY3RIO4TDEA2U1TMVLDGCW07I28F

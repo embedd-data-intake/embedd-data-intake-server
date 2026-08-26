@@ -4,6 +4,7 @@ import com.github.embedd_data_intake.server.dto.ExceptionDetailsDto;
 import com.github.embedd_data_intake.server.exceptions.NotFoundException;
 import com.github.embedd_data_intake.server.exceptions.UnauthorizedException;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -18,6 +19,22 @@ import java.time.OffsetDateTime;
 
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+    @Override
+    protected @Nullable ResponseEntity<Object> handleExceptionInternal(
+            Exception ex,
+            @Nullable Object body,
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode statusCode,
+            WebRequest request) {
+        ExceptionDetailsDto details = new ExceptionDetailsDto(
+                OffsetDateTime.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return new ResponseEntity<>(details, headers, statusCode);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionDetailsDto> handleDefault(Exception exception, WebRequest request) {
         ExceptionDetailsDto details = new ExceptionDetailsDto(

@@ -43,7 +43,6 @@ public class AuthController {
      */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authHeader) {
-        // TODO: Logout by refresh token id
         String token = authHeader.substring(7);
         UUID sid = jwtService.extractSessionId(token);
 
