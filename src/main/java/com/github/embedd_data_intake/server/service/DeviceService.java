@@ -6,7 +6,6 @@ import com.github.embedd_data_intake.server.enums.DeviceRole;
 import com.github.embedd_data_intake.server.exceptions.BadRequestException;
 import com.github.embedd_data_intake.server.exceptions.NotFoundException;
 import com.github.embedd_data_intake.server.model.Device;
-import com.github.embedd_data_intake.server.model.Email;
 import com.github.embedd_data_intake.server.model.User;
 import com.github.embedd_data_intake.server.model.UserDevice;
 import com.github.embedd_data_intake.server.repository.DeviceRepository;
@@ -104,6 +103,7 @@ public class DeviceService {
     @Transactional
     public UUID addDevice(UUID ownerId, String deviceName) throws NotFoundException {
         // TODO: Add new device identification fields when implementation of the device is ready
+        // TODO: Only allow verified emails to add
         Device device = new Device();
         device.setDeviceName(deviceName);
         deviceRepository.save(device);

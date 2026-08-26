@@ -43,6 +43,7 @@ public class AuthController {
      */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestBody RefreshRequestDto request) {
+        // TODO: Logout by refresh token id
         authService.logout(request.getRefreshToken());
         return ResponseEntity.noContent().build();
     }

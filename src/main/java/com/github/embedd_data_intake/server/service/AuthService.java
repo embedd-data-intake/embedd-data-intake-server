@@ -79,8 +79,8 @@ public class AuthService {
             throw new UnauthorizedException("Invalid email or password.");
         }
 
-        String accessToken = jwtService.generateAccessToken(user.getId());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
+        String accessToken = jwtService.generateAccessToken(user.getId(), refreshToken.getId());
 
         return new AuthTokensDto(accessToken, refreshToken.getToken());
     }
@@ -89,7 +89,7 @@ public class AuthService {
     public AuthTokensDto refresh(UUID refreshToken) {
         RefreshToken tokenRecord = refreshTokenService.verifyExpiration(refreshToken);
         User user = tokenRecord.getUser();
-        String newAccessToken = jwtService.generateAccessToken(user.getId());
+        String newAccessToken = jwtService.generateAccessToken(user.getId(), tokenRecord.getId());
 
         return new AuthTokensDto(newAccessToken, refreshToken);
     }
