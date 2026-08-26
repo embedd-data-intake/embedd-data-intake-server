@@ -1,5 +1,6 @@
 package com.github.embedd_data_intake.server.security;
 
+import com.github.embedd_data_intake.server.annotation.ApplyAuth;
 import com.github.embedd_data_intake.server.exceptions.UnauthorizedException;
 import com.github.embedd_data_intake.server.repository.RefreshTokenRepository;
 import com.github.embedd_data_intake.server.service.JwtService;
@@ -14,7 +15,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.HandlerExecutionChain;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -28,29 +32,49 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final HandlerExceptionResolver resolver;
+    private final RequestMappingHandlerMapping handlerMapping;
 
-    private static final List<Predicate<String>> EXPLICIT_FILTERS = List.of(
-            // TODO: Adjust when @ApplyAuth works
-            s -> s.equals("/api/v1/auth/login"),
-            s -> s.equals("/api/v1/auth/register"),
-            s -> s.equals("/api/v1/auth/refresh"),
-            s -> s.startsWith("/swagger-ui"),
-            s -> s.startsWith("/v3/api-docs")
-    );
+    // Apply path filters for Authorization filtering s -> s.startsWith("/v3/api-docs")
+    private static final List<Predicate<String>> EXPLICIT_FILTERS = List.of();
 
     public JwtAuthFilter(
             JwtService jwtService,
             RefreshTokenRepository refreshTokenRepository,
-            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
+            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver,
+            @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping handlerMapping) {
         this.jwtService = jwtService;
         this.refreshTokenRepository = refreshTokenRepository;
         this.resolver = resolver;
+        this.handlerMapping = handlerMapping;
     }
 
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
         String path = request.getServletPath();
-        return EXPLICIT_FILTERS.stream().anyMatch(filter -> filter.test(path));
+        if (EXPLICIT_FILTERS.stream().anyMatch(filter -> filter.test(path))) {
+            return false;
+        }
+
+        try {
+            // Find the handler mapping for the current request
+            HandlerExecutionChain handlerChain = handlerMapping.getHandler(request);
+
+            if (handlerChain != null && handlerChain.getHandler() instanceof HandlerMethod) {
+                HandlerMethod handlerMethod = (HandlerMethod) handlerChain.getHandler();
+
+                // Check if annotation exists on the method OR on the class (controller)
+                boolean hasMethodAnnotation = handlerMethod.hasMethodAnnotation(ApplyAuth.class);
+                boolean hasClassAnnotation = handlerMethod.getBeanType().isAnnotationPresent(ApplyAuth.class);
+
+                if (hasMethodAnnotation || hasClassAnnotation) {
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return true;
     }
 
     @Override
