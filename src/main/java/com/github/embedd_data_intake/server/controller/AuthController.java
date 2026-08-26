@@ -1,5 +1,6 @@
 package com.github.embedd_data_intake.server.controller;
 
+import com.github.embedd_data_intake.server.annotation.ApplyAuth;
 import com.github.embedd_data_intake.server.dto.AuthRequestDto;
 import com.github.embedd_data_intake.server.dto.AuthTokensDto;
 import com.github.embedd_data_intake.server.dto.RefreshRequestDto;
@@ -42,6 +43,7 @@ public class AuthController {
      * Single device logout: Invalidates provided refresh token.
      */
     @PostMapping("/logout")
+    @ApplyAuth
     public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.substring(7);
         UUID sid = jwtService.extractSessionId(token);
@@ -55,6 +57,7 @@ public class AuthController {
      * Global logout: Requires valid Bearer JWT and invalidates all session tokens for the user.
      */
     @PostMapping("/logout-all")
+    @ApplyAuth
     public ResponseEntity<Void> logoutAll(@AuthenticationPrincipal UUID userId) {
         authService.logoutAll(userId);
         return ResponseEntity.noContent().build();

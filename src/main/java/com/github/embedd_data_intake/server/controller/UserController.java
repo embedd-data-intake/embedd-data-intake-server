@@ -1,5 +1,6 @@
 package com.github.embedd_data_intake.server.controller;
 
+import com.github.embedd_data_intake.server.annotation.ApplyAuth;
 import com.github.embedd_data_intake.server.dto.DeviceRoleDto;
 import com.github.embedd_data_intake.server.dto.UserDto;
 import com.github.embedd_data_intake.server.enums.DeviceRole;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/user")
+@ApplyAuth
 public class UserController {
     private final UserService userService;
 

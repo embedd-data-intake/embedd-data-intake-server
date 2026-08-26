@@ -1,5 +1,6 @@
 package com.github.embedd_data_intake.server.controller;
 
+import com.github.embedd_data_intake.server.annotation.ApplyAuth;
 import com.github.embedd_data_intake.server.dto.AddDeviceDto;
 import com.github.embedd_data_intake.server.dto.DeviceDto;
 import com.github.embedd_data_intake.server.dto.ShareRequestDto;
@@ -18,6 +19,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/device")
+@ApplyAuth
 public class DeviceController {
     private final DeviceService deviceService;
 

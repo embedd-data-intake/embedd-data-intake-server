@@ -18,14 +18,25 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final HandlerExceptionResolver resolver;
+
+    private static final List<Predicate<String>> EXPLICIT_FILTERS = List.of(
+            // TODO: Adjust when @ApplyAuth works
+            s -> s.equals("/api/v1/auth/login"),
+            s -> s.equals("/api/v1/auth/register"),
+            s -> s.equals("/api/v1/auth/refresh"),
+            s -> s.startsWith("/swagger-ui"),
+            s -> s.startsWith("/v3/api-docs")
+    );
 
     public JwtAuthFilter(
             JwtService jwtService,
@@ -39,11 +50,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
         String path = request.getServletPath();
-        return path.equals("/api/v1/auth/login")
-                || path.equals("/api/v1/auth/register")
-                || path.equals("/api/v1/auth/refresh")
-                || path.startsWith("/swagger-ui")
-                || path.startsWith("/v3/api-docs");
+        return EXPLICIT_FILTERS.stream().anyMatch(filter -> filter.test(path));
     }
 
     @Override
