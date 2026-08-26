@@ -52,8 +52,8 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public void invalidateToken(UUID token) {
-        refreshTokenRepository.deleteByToken(token);
+    public void invalidateTokenId(UUID token) {
+        refreshTokenRepository.deleteById(token);
     }
 
     @Transactional

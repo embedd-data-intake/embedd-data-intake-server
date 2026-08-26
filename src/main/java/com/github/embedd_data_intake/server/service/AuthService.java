@@ -95,8 +95,8 @@ public class AuthService {
     }
 
     @Transactional
-    public void logout(UUID refreshToken) {
-        refreshTokenService.invalidateToken(refreshToken);
+    public void logout(UUID refreshTokenId) {
+        refreshTokenService.invalidateTokenId(refreshTokenId);
     }
 
     @Transactional
