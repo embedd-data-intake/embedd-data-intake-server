@@ -1,8 +1,12 @@
 package com.github.embedd_data_intake.server.service;
 
 import com.github.embedd_data_intake.server.dto.DeviceRoleDto;
+import com.github.embedd_data_intake.server.dto.UserDto;
 import com.github.embedd_data_intake.server.enums.DeviceRole;
+import com.github.embedd_data_intake.server.exceptions.NotFoundException;
+import com.github.embedd_data_intake.server.model.Email;
 import com.github.embedd_data_intake.server.model.UserDevice;
+import com.github.embedd_data_intake.server.repository.EmailRepository;
 import com.github.embedd_data_intake.server.repository.UserDeviceRepository;
 import org.springframework.stereotype.Service;
 
@@ -12,9 +16,11 @@ import java.util.UUID;
 
 @Service
 public class UserService {
+    private final EmailRepository emailRepository;
     private final UserDeviceRepository userDeviceRepository;
 
-    public UserService(UserDeviceRepository userDeviceRepository) {
+    public UserService(EmailRepository emailRepository, UserDeviceRepository userDeviceRepository) {
+        this.emailRepository = emailRepository;
         this.userDeviceRepository = userDeviceRepository;
     }
 
@@ -34,5 +40,12 @@ public class UserService {
         return userDevices.stream()
                 .map(userDevice -> new DeviceRoleDto(userDevice.getDevice().getId(), userDevice.getRole()))
                 .toList();
+    }
+
+    public UserDto getUser(UUID userId) {
+        Email emailAddress = emailRepository.findByUserEmails_UserId(userId)
+                .orElseThrow(() -> new NotFoundException("Email for user not found."));
+
+        return new UserDto(userId, emailAddress.getEmailAddress());
     }
 }

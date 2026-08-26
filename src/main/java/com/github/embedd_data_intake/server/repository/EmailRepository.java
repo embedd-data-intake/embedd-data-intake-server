@@ -19,27 +19,29 @@ public interface EmailRepository extends JpaRepository<Email, UUID> {
     boolean existsByEmailAddress(String emailAddress);
 
     @Query("""
-    SELECT DISTINCT new com.github.embedd_data_intake.server.dto.UserRoleDto(e.emailAddress, ud.role)
-    FROM UserDevice ud
-    JOIN ud.user u
-    JOIN UserEmail ue ON ue.user = u
-    JOIN ue.email e
-    WHERE ud.device.id = :deviceId
-      AND ud.deletedAt IS NULL
-      AND ue.deletedAt IS NULL
-""")
+        SELECT DISTINCT new com.github.embedd_data_intake.server.dto.UserRoleDto(e.emailAddress, ud.role)
+        FROM UserDevice ud
+        JOIN ud.user u
+        JOIN UserEmail ue ON ue.user = u
+        JOIN ue.email e
+        WHERE ud.device.id = :deviceId
+          AND ud.deletedAt IS NULL
+          AND ue.deletedAt IS NULL
+    """)
     List<UserRoleDto> findActiveUserEmailsForDevice(@Param("deviceId") UUID deviceId);
 
     @Query("""
-    SELECT DISTINCT new com.github.embedd_data_intake.server.dto.UserRoleDto(e.emailAddress, ud.role)
-    FROM UserDevice ud
-    JOIN ud.user u
-    JOIN UserEmail ue ON ue.user = u
-    JOIN ue.email e
-    WHERE ud.device.id = :deviceId
-      AND ud.role = :role
-      AND ud.deletedAt IS NULL
-      AND ue.deletedAt IS NULL
-""")
+        SELECT DISTINCT new com.github.embedd_data_intake.server.dto.UserRoleDto(e.emailAddress, ud.role)
+        FROM UserDevice ud
+        JOIN ud.user u
+        JOIN UserEmail ue ON ue.user = u
+        JOIN ue.email e
+        WHERE ud.device.id = :deviceId
+          AND ud.role = :role
+          AND ud.deletedAt IS NULL
+          AND ue.deletedAt IS NULL
+    """)
     List<UserRoleDto> findActiveUserEmailsForDeviceAndRole(@Param("deviceId") UUID deviceId, @Param("role") DeviceRole role);
+
+    Optional<Email> findByUserEmails_UserId(UUID userId);
 }
