@@ -1,11 +1,9 @@
 package com.github.embedd_data_intake.server.controller;
 
 import com.github.embedd_data_intake.server.annotation.ApplyAuth;
-import com.github.embedd_data_intake.server.dto.AddDeviceDto;
-import com.github.embedd_data_intake.server.dto.DeviceDto;
-import com.github.embedd_data_intake.server.dto.ShareRequestDto;
-import com.github.embedd_data_intake.server.dto.UserRoleDto;
+import com.github.embedd_data_intake.server.dto.*;
 import com.github.embedd_data_intake.server.enums.DeviceRole;
+import com.github.embedd_data_intake.server.service.AttributeService;
 import com.github.embedd_data_intake.server.service.DeviceService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,10 +19,14 @@ import java.util.UUID;
 @RequestMapping("api/v1/device")
 @ApplyAuth
 public class DeviceController {
-    private final DeviceService deviceService;
+    private static final String READ_PERMISSION = "@deviceSecurity.hasPermission(#deviceId, 'READ')";
 
-    public DeviceController(DeviceService deviceService) {
+    private final DeviceService deviceService;
+    private final AttributeService attributeService;
+
+    public DeviceController(DeviceService deviceService, AttributeService attributeService) {
         this.deviceService = deviceService;
+        this.attributeService = attributeService;
     }
 
     @PostMapping
@@ -43,6 +45,12 @@ public class DeviceController {
     @PreAuthorize("@deviceSecurity.hasPermission(#deviceId, 'READ')")
     public ResponseEntity<DeviceDto> getDevice(@PathVariable UUID deviceId) {
         return ResponseEntity.ok(deviceService.getDevice(deviceId));
+    }
+
+    @GetMapping("/{deviceId}/attributes")
+    @PreAuthorize(READ_PERMISSION)
+    public ResponseEntity<List<AttributeTypeDto>> getDeviceAttributes(@PathVariable UUID deviceId) {
+        return ResponseEntity.ok(attributeService.getDeviceAttributes(deviceId));
     }
 
     @GetMapping("/{deviceId}/access")
