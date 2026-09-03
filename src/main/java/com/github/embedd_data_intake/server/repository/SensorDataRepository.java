@@ -44,9 +44,6 @@ public interface SensorDataRepository extends JpaRepository<SensorData, SensorDa
     // Latest row for a deviceId + attributeId
     Optional<SensorData> findFirstByIdDeviceIdAndIdAttributeIdOrderByIdTimestampDesc(UUID deviceId, UUID attributeId);
 
-    // Selects the distinct Attribute entities linked to the matching deviceId records
-    List<Attribute> findDistinctAttributeByIdDeviceId(UUID deviceId);
-
     // All readings for a userId, ordered by newest first (Paginated)
     @Query("SELECT sd FROM SensorData sd " +
             "JOIN UserDevice ud ON sd.id.deviceId = ud.device.id " +

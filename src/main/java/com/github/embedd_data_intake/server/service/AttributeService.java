@@ -16,7 +16,7 @@ public class AttributeService {
     }
 
     public List<AttributeTypeDto> getDeviceAttributes(UUID deviceId) {
-        return attributeRepository.findDistinctAttributesByDeviceId(deviceId).stream()
+        return attributeRepository.findAttributesByDeviceId(deviceId).stream()
                 .map(attribute -> new AttributeTypeDto(attribute.getAttributeName(), attribute.getType()))
                 .toList();
     }

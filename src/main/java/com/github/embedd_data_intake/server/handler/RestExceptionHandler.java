@@ -28,7 +28,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             WebRequest request) {
         ExceptionDetailsDto details = new ExceptionDetailsDto(
                 OffsetDateTime.now(),
-                ex.getMessage(),
+                "Internal server error",
                 request.getDescription(false)
         );
 

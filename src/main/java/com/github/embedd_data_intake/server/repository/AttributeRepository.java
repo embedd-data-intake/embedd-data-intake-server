@@ -11,8 +11,9 @@ import java.util.UUID;
 
 @Repository
 public interface AttributeRepository extends JpaRepository<Attribute, UUID> {
-    // Distinct attributes linked to active device
-    List<Attribute> findDistinctAttributesByDeviceId(@Param("deviceId") UUID deviceId);
+    @Query("SELECT DISTINCT a FROM Attribute a, SensorData sd " +
+            "WHERE a.id = sd.id.attributeId AND sd.id.deviceId = :deviceId")
+    List<Attribute> findAttributesByDeviceId(@Param("deviceId") UUID deviceId);
 
     // Distinct attributes linked to active devices owned by a user
     @Query("SELECT DISTINCT sd.attribute FROM SensorData sd " +
