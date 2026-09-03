@@ -11,7 +11,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
 
   datasource:
     url: jdbc:postgresql://${PRIMARY_DB_HOST:localhost}:${PRIMARY_DB_PORT:5432}/${PRIMARY_DB_NAME:app_db}
@@ -22,8 +22,8 @@ spring:
     enabled: true
 
     placeholders:
-      timescaleHost: ${TIMESCALE_HOST:localhost}
-      timescalePort: ${TIMESCALE_PORT:5433}
+      timescaleHost: ${TIMESCALE_HOST:timescaledb}
+      timescalePort: ${TIMESCALE_PORT:5432}
       timescaleDb: ${TIMESCALE_DB:telemetry_db}
       timescaleUser: ${TIMESCALE_USER:ts_user}
       timescalePassword: ${TIMESCALE_PASSWORD:ts_password}
