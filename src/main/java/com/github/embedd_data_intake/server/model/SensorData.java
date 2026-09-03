@@ -1,10 +1,7 @@
 package com.github.embedd_data_intake.server.model;
 
 import com.github.embedd_data_intake.server.enums.AttributeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,6 +18,11 @@ import org.hibernate.annotations.Immutable;
 public class SensorData {
     @EmbeddedId
     private SensorDataId id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("attributeId")
+    @JoinColumn(name = "attribute_id")
+    private Attribute attribute;
 
     @Column(name = "val_num")
     private Double valNum;
