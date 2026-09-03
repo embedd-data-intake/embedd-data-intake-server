@@ -15,10 +15,20 @@ CREATE USER MAPPING IF NOT EXISTS FOR postgres
         password '${timescalePassword}'
     );
 
+CREATE FOREIGN TABLE IF NOT EXISTS foreign_attributes (
+    id UUID NOT NULL,
+    name VARCHAR(64) NOT NULL
+)
+SERVER timescale_server
+OPTIONS (schema_name 'public', table_name 'attributes');
+
 CREATE FOREIGN TABLE IF NOT EXISTS foreign_sensor_data (
     timestamp TIMESTAMPTZ NOT NULL,
     device_id UUID NOT NULL,
-    payload JSONB NOT NULL
+    attribute_id UUID NOT NULL,
+    val_num DOUBLE PRECISION,
+    val_string VARCHAR(255),
+    val_boolean BOOLEAN
 )
 SERVER timescale_server
 OPTIONS (schema_name 'public', table_name 'sensor_data');
