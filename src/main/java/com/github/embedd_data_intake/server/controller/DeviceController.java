@@ -7,7 +7,6 @@ import com.github.embedd_data_intake.server.service.AttributeService;
 import com.github.embedd_data_intake.server.service.DeviceService;
 import com.github.embedd_data_intake.server.service.SensorDataService;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -73,7 +72,7 @@ public class DeviceController {
     public ResponseEntity<SensorDataDto> getDeviceTelemetry(
             @PathVariable UUID deviceId,
             @Valid SensorDataFilterDto filter,
-            @PageableDefault(size = 20, sort = "id.atimestamp", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(size = 20, sort = "id.timestamp", direction = Sort.Direction.DESC) Pageable pageable
             ) {
         return ResponseEntity.ok(sensorDataService.getDataByDevice(deviceId, filter, pageable));
     }

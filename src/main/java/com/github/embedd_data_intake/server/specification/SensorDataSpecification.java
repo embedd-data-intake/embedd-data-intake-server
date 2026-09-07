@@ -25,6 +25,10 @@ public class SensorDataSpecification {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("id").get("timestamp"), filter.getTo()));
             }
 
+            if (filter.getAttributes() != null && !filter.getAttributes().isEmpty()) {
+                predicates.add(root.join("attribute").get("attributeName").in(filter.getAttributes()));
+            }
+
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
