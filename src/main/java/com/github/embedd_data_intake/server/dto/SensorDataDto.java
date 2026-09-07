@@ -12,6 +12,6 @@ import java.util.UUID;
 @Builder
 public class SensorDataDto {
     private UUID deviceId;
-    private List<SensorDataEntryDto> readings;
+    private List<SensorDataCollectionDto> readings;
     private PageDto page;
 }

@@ -1,18 +1,17 @@
 package com.github.embedd_data_intake.server.service;
 
-import com.github.embedd_data_intake.server.dto.PageDto;
-import com.github.embedd_data_intake.server.dto.SensorDataDto;
-import com.github.embedd_data_intake.server.dto.SensorDataEntryDto;
-import com.github.embedd_data_intake.server.dto.SensorDataFilterDto;
+import com.github.embedd_data_intake.server.dto.*;
+import com.github.embedd_data_intake.server.enums.AttributeType;
+import com.github.embedd_data_intake.server.model.Attribute;
 import com.github.embedd_data_intake.server.model.SensorData;
 import com.github.embedd_data_intake.server.repository.SensorDataRepository;
 import com.github.embedd_data_intake.server.specification.SensorDataSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SensorDataService {
@@ -23,20 +22,44 @@ public class SensorDataService {
     }
 
     public SensorDataDto getDataByDevice(UUID deviceId, SensorDataFilterDto filter, Pageable pageable) {
-        Specification<SensorData> spec = SensorDataSpecification.withFilter(deviceId, filter);
+        Page<SensorData> pageResult = sensorDataRepository.findAll(
+                SensorDataSpecification.withFilter(deviceId, filter),
+                pageable
+        );
 
-        Page<SensorDataEntryDto> readings = sensorDataRepository.findAll(spec, pageable)
-                .map(SensorDataEntryDto::new);
+        List<SensorDataCollectionDto> groupedReadings = groupSensorData(pageResult.getContent());
 
         return new SensorDataDto(
                 deviceId,
-                readings.getContent(),
-                new PageDto(
-                        readings.getNumber(),
-                        readings.getSize(),
-                        readings.getNumberOfElements(),
-                        readings.getTotalPages()
-                )
+                groupedReadings,
+                new PageDto(pageResult)
+        );
+    }
+
+    // Private helper to isolate the stream grouping logic
+    private List<SensorDataCollectionDto> groupSensorData(List<SensorData> dataList) {
+        Map<Attribute, List<SensorDataEntryDto>> groupedMap = dataList.stream()
+                .collect(Collectors.groupingBy(
+                        SensorData::getAttribute,
+                        LinkedHashMap::new,
+                        Collectors.mapping(this::toSensorDataEntryDto, Collectors.toList())
+                ));
+
+        return groupedMap.entrySet().stream()
+                .map(entry -> new SensorDataCollectionDto(
+                        entry.getKey().getAttributeName(),
+                        entry.getKey().getType(),
+                        entry.getValue()
+                ))
+                .toList();
+    }
+
+    // Dedicated mapper method for individual entries
+    private SensorDataEntryDto toSensorDataEntryDto(SensorData data) {
+        AttributeType type = data.getAttribute().getType();
+        return new SensorDataEntryDto(
+                data.getId().getTimestamp(),
+                data.getVal(type)
         );
     }
 }
