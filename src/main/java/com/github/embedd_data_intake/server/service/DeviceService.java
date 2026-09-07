@@ -90,11 +90,6 @@ public class DeviceService {
         userDeviceRepository.save(userDevice);
     }
 
-    public Object getTelemetry(UUID deviceId) {
-        // TODO: Connect to the TimescaleDB
-        throw new RuntimeException("Not yet implemented");
-    }
-
     /**
      * @param ownerId of the user who owns the device, will be assigned as 'OWNER'
      * @param deviceName which will show up when browsing devices
