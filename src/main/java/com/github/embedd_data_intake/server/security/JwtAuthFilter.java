@@ -30,7 +30,7 @@ import java.util.function.Predicate;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository; // TODO: Use service
     private final HandlerExceptionResolver resolver;
     private final RequestMappingHandlerMapping handlerMapping;
 

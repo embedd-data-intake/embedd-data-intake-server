@@ -17,6 +17,7 @@ public class RefreshTokenService {
     private static final String TOKEN_ERROR = "Refresh token expired or invalid. Please sign in.";
 
     private final RefreshTokenRepository refreshTokenRepository;
+
     private final long expirationDays;
 
     private final UserService userService;

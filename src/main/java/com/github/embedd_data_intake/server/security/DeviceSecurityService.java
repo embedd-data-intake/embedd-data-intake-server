@@ -14,8 +14,7 @@ import java.util.UUID;
 
 @Component("deviceSecurity")
 public class DeviceSecurityService {
-    private final UserDeviceRepository userDeviceRepository;
-
+    private final UserDeviceRepository userDeviceRepository; // TODO: Use service
 
     public DeviceSecurityService(UserDeviceRepository userDeviceRepository) {
         this.userDeviceRepository = userDeviceRepository;

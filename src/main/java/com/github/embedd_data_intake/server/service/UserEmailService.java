@@ -17,6 +17,7 @@ public class UserEmailService {
 
     @Transactional
     public void linkEmailToUser(UUID emailId, UUID userId) {
+        // TODO: Add email confirmation
         UserEmail userEmail = new UserEmail();
         userEmail.setUserId(userId);
         userEmail.setEmailId(emailId);

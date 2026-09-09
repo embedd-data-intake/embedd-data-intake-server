@@ -46,7 +46,6 @@ public class EmailService {
                     return emailRepository.save(newEmail);
                 });
 
-        // TODO: Add email confirmation
         return new EmailDto(email);
     }
 }

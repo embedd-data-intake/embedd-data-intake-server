@@ -19,6 +19,7 @@ import java.time.OffsetDateTime;
 
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+    // TODO: Check and fix exception handling
     @Override
     protected @Nullable ResponseEntity<Object> handleExceptionInternal(
             Exception ex,

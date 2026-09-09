@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 
 @Component
 public class TokenCleanupScheduler {
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository; // TODO: User service
 
     public TokenCleanupScheduler(RefreshTokenRepository refreshTokenRepository) {
         this.refreshTokenRepository = refreshTokenRepository;

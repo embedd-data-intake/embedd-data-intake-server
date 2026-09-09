@@ -1,7 +1,6 @@
 package com.github.embedd_data_intake.server.service;
 
 import com.github.embedd_data_intake.server.dto.UserDeviceDto;
-import com.github.embedd_data_intake.server.dto.UserRoleDto;
 import com.github.embedd_data_intake.server.enums.DeviceRole;
 import com.github.embedd_data_intake.server.exceptions.BadRequestException;
 import com.github.embedd_data_intake.server.exceptions.NotFoundException;
