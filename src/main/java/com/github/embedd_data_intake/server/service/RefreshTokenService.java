@@ -1,10 +1,9 @@
 package com.github.embedd_data_intake.server.service;
 
+import com.github.embedd_data_intake.server.dto.UserDto;
 import com.github.embedd_data_intake.server.exceptions.UnauthorizedException;
 import com.github.embedd_data_intake.server.model.RefreshToken;
-import com.github.embedd_data_intake.server.model.User;
 import com.github.embedd_data_intake.server.repository.RefreshTokenRepository;
-import com.github.embedd_data_intake.server.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,27 +13,25 @@ import java.util.UUID;
 
 @Service
 public class RefreshTokenService {
-    // TODO: Move unrelated repos to their own services
-    private final UserRepository userRepository;
-
     private final RefreshTokenRepository refreshTokenRepository;
     private final long expirationDays;
 
+    private final UserService userService;
+
     public RefreshTokenService(
-            UserRepository userRepository,
             RefreshTokenRepository refreshTokenRepository,
-            @Value("${jwt.refresh-expiration-days:30}") long expirationDays) {
-        this.userRepository = userRepository;
+            @Value("${jwt.refresh-expiration-days:30}") long expirationDays, UserService userService) {
+        this.userService = userService;
         this.refreshTokenRepository = refreshTokenRepository;
         this.expirationDays = expirationDays;
     }
 
     @Transactional
     public RefreshToken createRefreshToken(UUID userId) {
-        User user = userRepository.findById(userId).orElseThrow();
+        UserDto user = userService.getUser(userId);
 
         RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setUser(user);
+        refreshToken.setUserId(user.getId());
         refreshToken.setToken(UUID.randomUUID());
         refreshToken.setExpiresAt(OffsetDateTime.now().plusDays(this.expirationDays));
 

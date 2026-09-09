@@ -16,7 +16,6 @@ import java.util.UUID;
 
 @Service
 public class UserService {
-    // TODO: Move unrelated repos to their own services
     private final UserRepository userRepository;
 
     private final EmailService emailService;
