@@ -33,4 +33,20 @@ public class EmailService {
 
         return new EmailDto(email);
     }
+
+    public boolean isEmailInUse(String emailAddress) {
+        return emailRepository.existsByEmailAddress(emailAddress);
+    }
+
+    public EmailDto addOrGetEmail(String emailAddress) {
+        Email email = emailRepository.findByEmailAddress(emailAddress)
+                .orElseGet(() -> {
+                    Email newEmail = new Email();
+                    newEmail.setEmailAddress(emailAddress);
+                    return emailRepository.save(newEmail);
+                });
+
+        // TODO: Add email confirmation
+        return new EmailDto(email);
+    }
 }

@@ -24,13 +24,11 @@ public class UserEmail {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false, updatable = false)
+    private UUID userId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "email_id", nullable = false)
-    private Email email;
+    @Column(name = "email_id", nullable = false, updatable = false)
+    private UUID emailId;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -38,4 +36,12 @@ public class UserEmail {
 
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "email_id", insertable = false, updatable = false)
+    private Email email;
 }

@@ -3,12 +3,14 @@ package com.github.embedd_data_intake.server.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "refresh_tokens")
+@SQLRestriction("expires_at > CURRENT_TIMESTAMP")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,6 +36,6 @@ public class RefreshToken {
     private OffsetDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 }

@@ -1,5 +1,6 @@
 package com.github.embedd_data_intake.server.service;
 
+import com.github.embedd_data_intake.server.dto.RefreshTokenDto;
 import com.github.embedd_data_intake.server.dto.UserDto;
 import com.github.embedd_data_intake.server.exceptions.UnauthorizedException;
 import com.github.embedd_data_intake.server.model.RefreshToken;
@@ -13,6 +14,8 @@ import java.util.UUID;
 
 @Service
 public class RefreshTokenService {
+    private static final String TOKEN_ERROR = "Refresh token expired or invalid. Please sign in.";
+
     private final RefreshTokenRepository refreshTokenRepository;
     private final long expirationDays;
 
@@ -27,7 +30,7 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public RefreshToken createRefreshToken(UUID userId) {
+    public RefreshTokenDto createRefreshToken(UUID userId) {
         UserDto user = userService.getUser(userId);
 
         RefreshToken refreshToken = new RefreshToken();
@@ -35,19 +38,20 @@ public class RefreshTokenService {
         refreshToken.setToken(UUID.randomUUID());
         refreshToken.setExpiresAt(OffsetDateTime.now().plusDays(this.expirationDays));
 
-        return refreshTokenRepository.save(refreshToken);
+        return new RefreshTokenDto(refreshTokenRepository.save(refreshToken));
     }
 
     @Transactional
-    public RefreshToken verifyExpiration(UUID token) {
+    public RefreshTokenDto verifyExpiration(UUID token) throws UnauthorizedException {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new UnauthorizedException("Refresh token expired. Please sign in again."));
+                .orElseThrow(() -> new UnauthorizedException(TOKEN_ERROR));
 
         if (refreshToken.getExpiresAt().isBefore(OffsetDateTime.now())) {
             refreshTokenRepository.delete(refreshToken);
-            throw new UnauthorizedException("Refresh token expired. Please sign in again.");
+            throw new UnauthorizedException(TOKEN_ERROR);
         }
-        return refreshToken;
+
+        return new RefreshTokenDto(refreshToken);
     }
 
     @Transactional

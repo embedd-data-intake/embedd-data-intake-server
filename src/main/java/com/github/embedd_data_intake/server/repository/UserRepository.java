@@ -23,4 +23,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     // Eagerly fetches active emails to prevent N+1 queries
     @EntityGraph(attributePaths = {"userEmails", "userEmails.email"})
     Optional<User> findWithEmailsById(UUID emailId);
+
+    @EntityGraph(attributePaths = {"refreshTokens", "refreshTokens.token"})
+    Optional<User> findByRefreshTokens_Token(UUID token);
 }

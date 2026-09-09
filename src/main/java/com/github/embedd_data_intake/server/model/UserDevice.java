@@ -43,10 +43,10 @@ public class UserDevice {
     private OffsetDateTime deletedAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "device_id", nullable = false)
+    @JoinColumn(name = "device_id", insertable = false, updatable = false)
     private Device device;
 }
