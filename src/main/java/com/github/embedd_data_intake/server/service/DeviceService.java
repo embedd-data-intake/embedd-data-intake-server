@@ -1,37 +1,33 @@
 package com.github.embedd_data_intake.server.service;
 
 import com.github.embedd_data_intake.server.dto.DeviceDto;
+import com.github.embedd_data_intake.server.dto.UserDto;
 import com.github.embedd_data_intake.server.dto.UserRoleDto;
 import com.github.embedd_data_intake.server.enums.DeviceRole;
 import com.github.embedd_data_intake.server.exceptions.BadRequestException;
 import com.github.embedd_data_intake.server.exceptions.NotFoundException;
 import com.github.embedd_data_intake.server.model.Device;
-import com.github.embedd_data_intake.server.model.User;
-import com.github.embedd_data_intake.server.model.UserDevice;
 import com.github.embedd_data_intake.server.repository.DeviceRepository;
-import com.github.embedd_data_intake.server.repository.EmailRepository;
-import com.github.embedd_data_intake.server.repository.UserDeviceRepository;
-import com.github.embedd_data_intake.server.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 @Service
 public class DeviceService {
-    private final UserRepository userRepository;
     private final DeviceRepository deviceRepository;
-    private final UserDeviceRepository userDeviceRepository;
-    private final EmailRepository emailRepository;
 
-    public DeviceService(UserRepository userRepository, DeviceRepository deviceRepository, UserDeviceRepository userDeviceRepository, EmailRepository emailRepository) {
-        this.userRepository = userRepository;
+    private final UserService userService;
+    private final UserDeviceService userDeviceService;
+    private final EmailService emailService;
+
+    public DeviceService(DeviceRepository deviceRepository, UserService userService, UserDeviceService userDeviceService, EmailService emailService) {
+        this.userService = userService;
         this.deviceRepository = deviceRepository;
-        this.userDeviceRepository = userDeviceRepository;
-        this.emailRepository = emailRepository;
+        this.userDeviceService = userDeviceService;
+        this.emailService = emailService;
     }
 
     /**
@@ -42,27 +38,12 @@ public class DeviceService {
      */
     @Transactional
     public void grantAccess(UUID deviceId, String targetEmail, DeviceRole role) throws NotFoundException {
-        User targetUser = userRepository.findByUserEmails_Email_EmailAddress(targetEmail)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        UserDto targetUser = userService.getUser(targetEmail);
 
         Device device = deviceRepository.findById(deviceId)
                 .orElseThrow(() -> new NotFoundException("Device not found"));
 
-        // Check if mapping exists, update or create new
-        UserDevice userDevice = userDeviceRepository.findByUserIdAndDevice_Id(targetUser.getId(), deviceId)
-                .orElseGet(() -> {
-                    UserDevice ud = new UserDevice();
-                    ud.setUser(targetUser);
-                    ud.setDevice(device);
-                    return ud;
-                });
-
-        // TODO: Add check/handling if user wants to add an owner
-        // TODO: Add recipient confirmation
-
-        userDevice.setRole(role);
-        userDevice.setDeletedAt(null); // Restore if soft-deleted previously
-        userDeviceRepository.save(userDevice);
+        userDeviceService.grantAccess(targetUser.getId(), deviceId, role);
     }
 
     /**
@@ -73,21 +54,12 @@ public class DeviceService {
      */
     @Transactional
     public void removeAccess(UUID deviceId, String targetEmail) throws NotFoundException, BadRequestException {
-        User targetUser = userRepository.findByUserEmails_Email_EmailAddress(targetEmail)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        UserDto targetUser = userService.getUser(targetEmail);
 
         Device device = deviceRepository.findById(deviceId)
                 .orElseThrow(() -> new NotFoundException("Device not found"));
 
-        UserDevice userDevice = userDeviceRepository.findByUserIdAndDevice_Id(targetUser.getId(), deviceId)
-                .orElseThrow(() -> new NotFoundException("User does not have access to the device"));
-
-        if (Objects.equals(userDevice.getRole(), DeviceRole.OWNER)) {
-            throw new BadRequestException("Cannot remove the owner of the device.");
-        }
-
-        userDevice.setDeletedAt(OffsetDateTime.now());
-        userDeviceRepository.save(userDevice);
+        userDeviceService.removeAccess(targetUser.getId(), device.getId());
     }
 
     /**
@@ -99,18 +71,13 @@ public class DeviceService {
     public UUID addDevice(UUID ownerId, String deviceName) throws NotFoundException {
         // TODO: Add new device identification fields when implementation of the device is ready
         // TODO: Only allow verified emails to add
+        UserDto user = userService.getUser(ownerId);
+
         Device device = new Device();
         device.setDeviceName(deviceName);
         deviceRepository.save(device);
 
-        User user = userRepository.findById(ownerId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
-
-        UserDevice userDevice = new UserDevice();
-        userDevice.setUser(user);
-        userDevice.setDevice(device);
-        userDevice.setRole(DeviceRole.OWNER);
-        userDeviceRepository.save(userDevice);
+        userDeviceService.addDeviceToUser(user.getId(), device.getId(), DeviceRole.OWNER);
 
         return device.getId();
     }
@@ -119,15 +86,15 @@ public class DeviceService {
         Device device = deviceRepository.findById(deviceId)
                 .orElseThrow(() -> new NotFoundException("Device not found."));
 
-        return new DeviceDto(device.getId(), device.getDeviceName());
+        return new DeviceDto(device);
     }
 
     public List<UserRoleDto> getDeviceAccess(UUID deviceId, DeviceRole role) {
         List<UserRoleDto> userRoles;
         if (Objects.isNull(role)) {
-            userRoles = emailRepository.findActiveUserEmailsForDevice(deviceId);
+            userRoles = emailService.getAccessForDevice(deviceId);
         } else {
-            userRoles = emailRepository.findActiveUserEmailsForDeviceAndRole(deviceId, role);
+            userRoles = emailService.getAccessForDevice(deviceId, role);
         }
 
         return userRoles;

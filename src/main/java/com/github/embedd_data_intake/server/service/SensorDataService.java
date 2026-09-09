@@ -23,7 +23,7 @@ public class SensorDataService {
 
     public SensorDataDto getDataByDevice(UUID deviceId, SensorDataFilterDto filter, Pageable pageable) {
         Page<SensorData> pageResult = sensorDataRepository.findAll(
-                SensorDataSpecification.withFilter(deviceId, filter),
+                SensorDataSpecification.withDeviceFilter(deviceId, filter),
                 pageable
         );
 
@@ -34,6 +34,35 @@ public class SensorDataService {
                 groupedReadings,
                 new PageDto(pageResult)
         );
+    }
+
+
+    public Map<UUID, List<SensorDataCollectionDto>> getDataByUser(UUID userId, SensorDataFilterDto filter, Pageable pageable) {
+        // TODO: Fix if end up using it
+        Page<SensorData> pageResult = sensorDataRepository.findAll(
+                SensorDataSpecification.withUserFilter(userId, filter),
+                pageable
+        );
+
+        Map<UUID, List<SensorDataCollectionDto>> collection = new HashMap<>();
+
+        for (SensorData result : pageResult) {
+            collection.computeIfAbsent(result.getId().getDeviceId(), k -> new ArrayList<SensorDataCollectionDto>())
+                    .add(new SensorDataCollectionDto(
+                            result.getAttribute().getAttributeName(),
+                            result.getAttribute().getType(),
+                            pageResult.getContent()
+                                    .stream()
+                                    .filter(sensorData -> sensorData.getId().getDeviceId().equals(result.getId().getDeviceId()))
+                                    .map(data -> new SensorDataEntryDto(
+                                            data.getId().getTimestamp(),
+                                            data.getVal(data.getAttribute().getType())
+                                    ))
+                                    .toList()
+                    ));
+        }
+
+        return collection;
     }
 
     // Private helper to isolate the stream grouping logic

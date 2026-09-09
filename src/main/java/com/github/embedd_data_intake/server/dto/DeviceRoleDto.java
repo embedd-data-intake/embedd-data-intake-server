@@ -13,4 +13,10 @@ import java.util.UUID;
 public class DeviceRoleDto {
     private UUID deviceId;
     private DeviceRole role;
+
+
+    public DeviceRoleDto(UserDeviceDto userDeviceDto) {
+        this.deviceId = userDeviceDto.getDeviceId();
+        this.role = userDeviceDto.getRole();
+    }
 }

@@ -43,6 +43,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 request.getDescription(false)
         );
 
+        exception.printStackTrace();
+
         return new ResponseEntity<>(details, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

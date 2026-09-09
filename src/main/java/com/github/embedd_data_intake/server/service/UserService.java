@@ -1,13 +1,13 @@
 package com.github.embedd_data_intake.server.service;
 
 import com.github.embedd_data_intake.server.dto.DeviceRoleDto;
+import com.github.embedd_data_intake.server.dto.EmailDto;
+import com.github.embedd_data_intake.server.dto.UserDeviceDto;
 import com.github.embedd_data_intake.server.dto.UserDto;
 import com.github.embedd_data_intake.server.enums.DeviceRole;
 import com.github.embedd_data_intake.server.exceptions.NotFoundException;
-import com.github.embedd_data_intake.server.model.Email;
-import com.github.embedd_data_intake.server.model.UserDevice;
-import com.github.embedd_data_intake.server.repository.EmailRepository;
-import com.github.embedd_data_intake.server.repository.UserDeviceRepository;
+import com.github.embedd_data_intake.server.model.User;
+import com.github.embedd_data_intake.server.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,12 +16,16 @@ import java.util.UUID;
 
 @Service
 public class UserService {
-    private final EmailRepository emailRepository;
-    private final UserDeviceRepository userDeviceRepository;
+    // TODO: Move unrelated repos to their own services
+    private final UserRepository userRepository;
 
-    public UserService(EmailRepository emailRepository, UserDeviceRepository userDeviceRepository) {
-        this.emailRepository = emailRepository;
-        this.userDeviceRepository = userDeviceRepository;
+    private final EmailService emailService;
+    private final UserDeviceService userDeviceService;
+
+    public UserService(UserRepository userRepository, EmailService emailService, UserDeviceService userDeviceService) {
+        this.emailService = emailService;
+        this.userDeviceService = userDeviceService;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -30,22 +34,26 @@ public class UserService {
      * @return list of device ids and the role the user has with them
      */
     public List<DeviceRoleDto> getUserDevices(UUID userId, DeviceRole role) {
-        List<UserDevice> userDevices;
+        List<UserDeviceDto> userDevices;
         if (Objects.isNull(role)) {
-            userDevices = userDeviceRepository.findByUserId(userId);
+            userDevices = userDeviceService.findByUserId(userId);
         } else {
-            userDevices = userDeviceRepository.findByUserIdAndRole(userId, role);
+            userDevices = userDeviceService.findByUserIdAndRole(userId, role);
         }
 
-        return userDevices.stream()
-                .map(userDevice -> new DeviceRoleDto(userDevice.getDevice().getId(), userDevice.getRole()))
-                .toList();
+        return userDevices.stream().map(DeviceRoleDto::new).toList();
     }
 
     public UserDto getUser(UUID userId) {
-        Email emailAddress = emailRepository.findByUserEmails_UserId(userId)
+        EmailDto emailDto = emailService.getEmailByUserId(userId);
+
+        return new UserDto(userId, emailDto.getEmailAddress());
+    }
+
+    public UserDto getUser(String emailAddress) {
+        User user = userRepository.findByUserEmails_Email_EmailAddress(emailAddress)
                 .orElseThrow(() -> new NotFoundException("Email for user not found."));
 
-        return new UserDto(userId, emailAddress.getEmailAddress());
+        return new UserDto(user.getId(), emailAddress);
     }
 }

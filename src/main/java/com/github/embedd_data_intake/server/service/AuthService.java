@@ -18,12 +18,14 @@ import java.util.UUID;
 
 @Service
 public class AuthService {
+    // TODO: Move unrelated repos to their own services
     private final UserRepository userRepository;
     private final EmailRepository emailRepository;
     private final UserEmailRepository userEmailRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+
+    private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
     public AuthService(
             UserRepository userRepository,
