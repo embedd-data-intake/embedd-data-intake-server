@@ -33,7 +33,7 @@ public class UserDeviceService {
 
     @Transactional
     public void grantAccess(UUID userId, UUID deviceId, DeviceRole role) {
-        UserDevice userDevice = userDeviceRepository.findByUserIdAndDevice_Id(userId, deviceId)
+        UserDevice userDevice = userDeviceRepository.findByUserIdAndDeviceId(userId, deviceId)
                 .orElseGet(() -> {
                     UserDevice ud = new UserDevice();
                     ud.setUserId(userId);
@@ -51,7 +51,7 @@ public class UserDeviceService {
 
     @Transactional
     public void removeAccess(UUID userId, UUID deviceId) {
-        UserDevice userDevice = userDeviceRepository.findByUserIdAndDevice_Id(userId, deviceId)
+        UserDevice userDevice = userDeviceRepository.findByUserIdAndDeviceId(userId, deviceId)
                 .orElseThrow(() -> new NotFoundException("Device not found."));
 
         if (Objects.equals(userDevice.getRole(), DeviceRole.OWNER)) {
@@ -72,5 +72,11 @@ public class UserDeviceService {
         List<UserDevice> userDevice = userDeviceRepository.findByUserIdAndRole(userId, role);
 
         return userDevice.stream().map(UserDeviceDto::new).toList();
+    }
+
+    public boolean userHasPermission(UUID userId, UUID deviceId, DeviceRole requiredRole) throws NotFoundException {
+        return userDeviceRepository.findByUserIdAndDeviceId(userId, deviceId)
+                .orElseThrow(() -> new NotFoundException("Device not found."))
+                .getRole().hasPermission(requiredRole);
     }
 }

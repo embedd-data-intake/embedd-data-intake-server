@@ -64,4 +64,13 @@ public class RefreshTokenService {
     public void invalidateAllTokens(UUID userId) {
         refreshTokenRepository.deleteByUserId(userId);
     }
+
+    public boolean existsById(UUID id) {
+        return refreshTokenRepository.existsById(id);
+    }
+
+    @Transactional
+    public void deleteExpiredRefreshTokens() {
+        this.refreshTokenRepository.deleteByExpiresAtBefore(OffsetDateTime.now());
+    }
 }

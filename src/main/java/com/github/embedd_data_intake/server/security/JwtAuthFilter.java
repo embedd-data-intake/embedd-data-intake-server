@@ -2,8 +2,8 @@ package com.github.embedd_data_intake.server.security;
 
 import com.github.embedd_data_intake.server.annotation.ApplyAuth;
 import com.github.embedd_data_intake.server.exceptions.UnauthorizedException;
-import com.github.embedd_data_intake.server.repository.RefreshTokenRepository;
 import com.github.embedd_data_intake.server.service.JwtService;
+import com.github.embedd_data_intake.server.service.RefreshTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,7 +30,7 @@ import java.util.function.Predicate;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
-    private final RefreshTokenRepository refreshTokenRepository; // TODO: Use service
+    private final RefreshTokenService refreshTokenService;
     private final HandlerExceptionResolver resolver;
     private final RequestMappingHandlerMapping handlerMapping;
 
@@ -39,11 +39,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     public JwtAuthFilter(
             JwtService jwtService,
-            RefreshTokenRepository refreshTokenRepository,
+            RefreshTokenService refreshTokenService,
             @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver,
             @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping handlerMapping) {
         this.jwtService = jwtService;
-        this.refreshTokenRepository = refreshTokenRepository;
+        this.refreshTokenService = refreshTokenService;
         this.resolver = resolver;
         this.handlerMapping = handlerMapping;
     }
@@ -91,7 +91,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             UUID sid = jwtService.extractSessionId(token);
 
             // Check if refresh token id is valid and present in the db
-            if (Objects.isNull(sid) || !refreshTokenRepository.existsById(sid)) {
+            if (Objects.isNull(sid) || !refreshTokenService.existsById(sid)) {
                 throw new UnauthorizedException("Invalid or expired access token.");
             }
 

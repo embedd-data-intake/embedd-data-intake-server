@@ -1,23 +1,21 @@
 package com.github.embedd_data_intake.server.scheduler;
 
-import com.github.embedd_data_intake.server.repository.RefreshTokenRepository;
+import com.github.embedd_data_intake.server.service.RefreshTokenService;
 import jakarta.transaction.Transactional;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.OffsetDateTime;
-
 @Component
 public class TokenCleanupScheduler {
-    private final RefreshTokenRepository refreshTokenRepository; // TODO: User service
+    private final RefreshTokenService refreshTokenService;
 
-    public TokenCleanupScheduler(RefreshTokenRepository refreshTokenRepository) {
-        this.refreshTokenRepository = refreshTokenRepository;
+    public TokenCleanupScheduler(RefreshTokenService refreshTokenService) {
+        this.refreshTokenService = refreshTokenService;
     }
 
     @Scheduled(cron = "0 0 3 * * ?")
     @Transactional
     public void removeExpiredTokens() {
-        refreshTokenRepository.deleteByExpiresAtBefore(OffsetDateTime.now());
+        refreshTokenService.deleteExpiredRefreshTokens();
     }
 }

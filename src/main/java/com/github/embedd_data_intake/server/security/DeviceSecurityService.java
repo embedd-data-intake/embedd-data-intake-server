@@ -3,7 +3,7 @@ package com.github.embedd_data_intake.server.security;
 import com.github.embedd_data_intake.server.enums.DeviceRole;
 import com.github.embedd_data_intake.server.exceptions.NotFoundException;
 import com.github.embedd_data_intake.server.exceptions.UnauthorizedException;
-import com.github.embedd_data_intake.server.repository.UserDeviceRepository;
+import com.github.embedd_data_intake.server.service.UserDeviceService;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,10 +14,10 @@ import java.util.UUID;
 
 @Component("deviceSecurity")
 public class DeviceSecurityService {
-    private final UserDeviceRepository userDeviceRepository; // TODO: Use service
+    private final UserDeviceService userDeviceService;
 
-    public DeviceSecurityService(UserDeviceRepository userDeviceRepository) {
-        this.userDeviceRepository = userDeviceRepository;
+    public DeviceSecurityService(UserDeviceService userDeviceService) {
+        this.userDeviceService = userDeviceService;
     }
 
     /**
@@ -36,9 +36,6 @@ public class DeviceSecurityService {
         UUID currentUserId = (UUID) auth.getPrincipal();
         DeviceRole requiredRole = DeviceRole.valueOf(requiredRoleName);
 
-        // Get the active user-device relationship and check the role of the user for the respective device
-        return userDeviceRepository.findByUserIdAndDevice_Id(currentUserId, deviceId)
-                .map(role -> role.getRole().hasPermission(requiredRole))
-                .orElseThrow(() -> new NotFoundException("Device not found."));
+        return userDeviceService.userHasPermission(currentUserId, deviceId, requiredRole);
     }
 }
