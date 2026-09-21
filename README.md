@@ -6,6 +6,13 @@ This repository is a part of a bigger project about a platform for ingesting and
 repository) purpose is to expose REST API for the user to allow them to create accounts and register, manage share IoT
 nodes as well as access the data gathered (using a MQTT ingest) by the nodes.
 
+## Development
+
+- Using the `dev` profile exposes the swagger docs
+
+- Database dependencies can be fulfilled using the docker-compose in the
+[embedd-data-intake](https://github.com/embedd-data-intake/embedd-data-intake/) repository
+
 ## Stack
 
 ### Server
