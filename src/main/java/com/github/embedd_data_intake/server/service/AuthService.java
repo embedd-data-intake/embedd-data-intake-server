@@ -3,7 +3,6 @@ package com.github.embedd_data_intake.server.service;
 import com.github.embedd_data_intake.server.dto.AuthTokensDto;
 import com.github.embedd_data_intake.server.dto.RefreshTokenDto;
 import com.github.embedd_data_intake.server.dto.UserDto;
-import com.github.embedd_data_intake.server.model.RefreshToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
