@@ -2,8 +2,8 @@ package com.github.embedd_data_intake.server.service;
 
 import com.github.embedd_data_intake.server.dto.UserDeviceDto;
 import com.github.embedd_data_intake.server.enums.DeviceRole;
-import com.github.embedd_data_intake.server.exceptions.BadRequestException;
-import com.github.embedd_data_intake.server.exceptions.NotFoundException;
+import com.github.embedd_data_intake.server.exceptions.impl.BadRequestException;
+import com.github.embedd_data_intake.server.exceptions.impl.NotFoundException;
 import com.github.embedd_data_intake.server.model.UserDevice;
 import com.github.embedd_data_intake.server.repository.UserDeviceRepository;
 import org.junit.jupiter.api.DisplayName;

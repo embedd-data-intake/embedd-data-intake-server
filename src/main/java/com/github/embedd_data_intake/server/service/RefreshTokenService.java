@@ -2,7 +2,7 @@ package com.github.embedd_data_intake.server.service;
 
 import com.github.embedd_data_intake.server.dto.RefreshTokenDto;
 import com.github.embedd_data_intake.server.dto.UserDto;
-import com.github.embedd_data_intake.server.exceptions.UnauthorizedException;
+import com.github.embedd_data_intake.server.exceptions.impl.UnauthorizedException;
 import com.github.embedd_data_intake.server.model.RefreshToken;
 import com.github.embedd_data_intake.server.repository.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Value;

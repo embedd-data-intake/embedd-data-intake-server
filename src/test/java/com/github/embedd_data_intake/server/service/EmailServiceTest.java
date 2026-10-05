@@ -3,7 +3,7 @@ package com.github.embedd_data_intake.server.service;
 import com.github.embedd_data_intake.server.dto.EmailDto;
 import com.github.embedd_data_intake.server.dto.UserRoleDto;
 import com.github.embedd_data_intake.server.enums.DeviceRole;
-import com.github.embedd_data_intake.server.exceptions.NotFoundException;
+import com.github.embedd_data_intake.server.exceptions.impl.NotFoundException;
 import com.github.embedd_data_intake.server.model.Email;
 import com.github.embedd_data_intake.server.repository.EmailRepository;
 import org.junit.jupiter.api.DisplayName;

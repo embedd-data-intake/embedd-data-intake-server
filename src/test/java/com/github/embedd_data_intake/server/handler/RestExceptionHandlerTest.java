@@ -1,8 +1,8 @@
 package com.github.embedd_data_intake.server.handler;
 
 import com.github.embedd_data_intake.server.dto.ExceptionDetailsDto;
-import com.github.embedd_data_intake.server.exceptions.NotFoundException;
-import com.github.embedd_data_intake.server.exceptions.UnauthorizedException;
+import com.github.embedd_data_intake.server.exceptions.impl.NotFoundException;
+import com.github.embedd_data_intake.server.exceptions.impl.UnauthorizedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,7 +27,6 @@ import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class RestExceptionHandlerTest {
-
     @Mock
     private WebRequest webRequest;
 
@@ -44,17 +43,13 @@ class RestExceptionHandlerTest {
     @Nested
     @DisplayName("handleUnauthorized()")
     class HandleUnauthorizedTests {
-
         @Test
         void handleUnauthorized_Returns401AndExceptionMessage() {
-            // Arrange
             String errorMessage = "User is not authenticated";
             UnauthorizedException exception = new UnauthorizedException(errorMessage);
 
-            // Act
-            ResponseEntity<ExceptionDetailsDto> response = restExceptionHandler.handleUnauthorized(exception, webRequest);
+            ResponseEntity<ExceptionDetailsDto> response = restExceptionHandler.handleRestException(exception, webRequest);
 
-            // Assert
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
             assertThat(response.getBody()).isNotNull();
             assertThat(response.getBody().getMessage()).isEqualTo(errorMessage);
@@ -69,14 +64,11 @@ class RestExceptionHandlerTest {
 
         @Test
         void handleNotFound_Returns404AndExceptionMessage() {
-            // Arrange
             String errorMessage = "Device not found";
             NotFoundException exception = new NotFoundException(errorMessage);
 
-            // Act
-            ResponseEntity<ExceptionDetailsDto> response = restExceptionHandler.handleNotFound(exception, webRequest);
+            ResponseEntity<ExceptionDetailsDto> response = restExceptionHandler.handleRestException(exception, webRequest);
 
-            // Assert
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
             assertThat(response.getBody()).isNotNull();
             assertThat(response.getBody().getMessage()).isEqualTo(errorMessage);
@@ -88,16 +80,12 @@ class RestExceptionHandlerTest {
     @Nested
     @DisplayName("handleDefault()")
     class HandleDefaultTests {
-
         @Test
         void handleDefault_Returns500AndGenericInternalServerErrorMessage() {
-            // Arrange
             Exception exception = new RuntimeException("Unexpected NullPointerException inside application");
 
-            // Act
             ResponseEntity<ExceptionDetailsDto> response = restExceptionHandler.handleDefault(exception, webRequest);
 
-            // Assert
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
             assertThat(response.getBody()).isNotNull();
             assertThat(response.getBody().getMessage()).isEqualTo("Internal server error");

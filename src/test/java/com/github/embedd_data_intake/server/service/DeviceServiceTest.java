@@ -4,8 +4,8 @@ import com.github.embedd_data_intake.server.dto.DeviceDto;
 import com.github.embedd_data_intake.server.dto.UserDto;
 import com.github.embedd_data_intake.server.dto.UserRoleDto;
 import com.github.embedd_data_intake.server.enums.DeviceRole;
-import com.github.embedd_data_intake.server.exceptions.BadRequestException;
-import com.github.embedd_data_intake.server.exceptions.NotFoundException;
+import com.github.embedd_data_intake.server.exceptions.impl.BadRequestException;
+import com.github.embedd_data_intake.server.exceptions.impl.NotFoundException;
 import com.github.embedd_data_intake.server.model.Device;
 import com.github.embedd_data_intake.server.repository.DeviceRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +30,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DeviceServiceTest {
-
     @Mock
     private DeviceRepository deviceRepository;
 
@@ -57,7 +56,6 @@ class DeviceServiceTest {
     @Nested
     @DisplayName("grantAccess()")
     class GrantAccessTests {
-
         @Test
         void grantAccess_WhenUserAndDeviceExist_GrantsAccess() throws NotFoundException {
             UUID deviceId = UUID.randomUUID();

@@ -1,7 +1,7 @@
 package com.github.embedd_data_intake.server.security;
 
 import com.github.embedd_data_intake.server.annotation.ApplyAuth;
-import com.github.embedd_data_intake.server.exceptions.UnauthorizedException;
+import com.github.embedd_data_intake.server.exceptions.impl.UnauthorizedException;
 import com.github.embedd_data_intake.server.service.JwtService;
 import com.github.embedd_data_intake.server.service.RefreshTokenService;
 import jakarta.servlet.FilterChain;

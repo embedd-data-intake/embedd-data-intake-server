@@ -1,8 +1,7 @@
 package com.github.embedd_data_intake.server.handler;
 
 import com.github.embedd_data_intake.server.dto.ExceptionDetailsDto;
-import com.github.embedd_data_intake.server.exceptions.NotFoundException;
-import com.github.embedd_data_intake.server.exceptions.UnauthorizedException;
+import com.github.embedd_data_intake.server.exceptions.RestException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpHeaders;
@@ -47,26 +46,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(details, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ExceptionDetailsDto> handleUnauthorized(Exception exception, WebRequest request) {
+    @ExceptionHandler(RestException.class)
+    public ResponseEntity<ExceptionDetailsDto> handleRestException(RestException exception, WebRequest request) {
         ExceptionDetailsDto details = new ExceptionDetailsDto(
                 OffsetDateTime.now(),
                 exception.getMessage(),
                 request.getDescription(false)
         );
 
-        return new ResponseEntity<>(details, HttpStatus.UNAUTHORIZED);
-    }
-
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ExceptionDetailsDto> handleNotFound(Exception exception, WebRequest request) {
-        ExceptionDetailsDto details = new ExceptionDetailsDto(
-                OffsetDateTime.now(),
-                exception.getMessage(),
-                request.getDescription(false)
-        );
-
-        return new ResponseEntity<>(details, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(details, exception.getStatus());
     }
 
     @Override

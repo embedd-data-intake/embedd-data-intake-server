@@ -1,8 +1,8 @@
 package com.github.embedd_data_intake.server.security;
 
 import com.github.embedd_data_intake.server.enums.DeviceRole;
-import com.github.embedd_data_intake.server.exceptions.NotFoundException;
-import com.github.embedd_data_intake.server.exceptions.UnauthorizedException;
+import com.github.embedd_data_intake.server.exceptions.impl.NotFoundException;
+import com.github.embedd_data_intake.server.exceptions.impl.UnauthorizedException;
 import com.github.embedd_data_intake.server.service.UserDeviceService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
