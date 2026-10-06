@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -47,7 +48,7 @@ public class UserController {
     }
 
     @GetMapping("/data")
-    public ResponseEntity<?> getUserTelemetry(
+    public ResponseEntity<Map<UUID, List<SensorDataCollectionDto>>> getUserTelemetry(
             @AuthenticationPrincipal UUID userId,
             @Valid SensorDataFilterDto filter,
             @PageableDefault(size = 20, sort = "id.timestamp", direction = Sort.Direction.DESC) Pageable pageable
