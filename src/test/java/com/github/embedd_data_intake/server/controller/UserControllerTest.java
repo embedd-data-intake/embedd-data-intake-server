@@ -58,11 +58,15 @@ class UserControllerTest {
 
     private UUID userId;
     private UUID sessionId;
+    private String bearerHeader;
 
     @BeforeEach
     void setUp() {
         userId = UUID.randomUUID();
         sessionId = UUID.randomUUID();
+        bearerHeader = "Bearer " + UUID.randomUUID();
+
+        authenticatedSetup();
     }
 
     void authenticatedSetup() {
@@ -78,10 +82,8 @@ class UserControllerTest {
         @WithUserDetails
         @DisplayName("Should return 200 OK with UserDto when user is found")
         void getUser_Success() throws Exception {
-            authenticatedSetup();
-
             mockMvc.perform(get("/api/v1/user")
-                            .header(HttpHeaders.AUTHORIZATION, "Bearer token")
+                            .header(HttpHeaders.AUTHORIZATION, bearerHeader)
                             .principal(() -> userId.toString())
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk());
@@ -93,14 +95,12 @@ class UserControllerTest {
         @WithUserDetails
         @DisplayName("Should return status from RestException and ExceptionDetailsDto payload")
         void getUser_RestException() throws Exception {
-            authenticatedSetup();
-
             given(userService.getUser(userId))
                     .willThrow(new NotFoundException("User not found"));
 
 
             mockMvc.perform(get("/api/v1/user")
-                            .header(HttpHeaders.AUTHORIZATION, "Bearer token")
+                            .header(HttpHeaders.AUTHORIZATION, bearerHeader)
                             .principal(() -> userId.toString())
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isNotFound())
@@ -114,13 +114,11 @@ class UserControllerTest {
         @WithUserDetails
         @DisplayName("Should return 500 Internal Server Error for unhandled exceptions")
         void getUser_UnhandledException() throws Exception {
-            authenticatedSetup();
-
             given(userService.getUser(userId))
                     .willThrow(new RuntimeException("Database error"));
 
             mockMvc.perform(get("/api/v1/user")
-                            .header(HttpHeaders.AUTHORIZATION, "Bearer token")
+                            .header(HttpHeaders.AUTHORIZATION, bearerHeader)
                             .principal(() -> userId.toString())
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isInternalServerError())
@@ -131,18 +129,15 @@ class UserControllerTest {
     @Nested
     @DisplayName("GET /api/v1/user/attributes - getUserAttributes")
     class GetUserAttributesTests {
-
         @Test
         @WithUserDetails
         @DisplayName("Should return 200 OK with attribute list")
         void getUserAttributes_Success() throws Exception {
-            authenticatedSetup();
-
             List<AttributeTypeDto> attributes = List.of(new AttributeTypeDto());
             given(attributeService.getUserAttributes(userId)).willReturn(attributes);
 
             mockMvc.perform(get("/api/v1/user/attributes")
-                            .header(HttpHeaders.AUTHORIZATION, "Bearer token")
+                            .header(HttpHeaders.AUTHORIZATION, bearerHeader)
                             .principal(() -> userId.toString())
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
@@ -159,15 +154,13 @@ class UserControllerTest {
         @WithUserDetails
         @DisplayName("Should return 200 OK when role parameter is provided")
         void getDevices_WithRoleParam() throws Exception {
-            authenticatedSetup();
-
             DeviceRole role = DeviceRole.values()[0]; // Resolves dynamically from your enum
             List<DeviceRoleDto> devices = List.of(new DeviceRoleDto());
             given(userService.getUserDevices(userId, role)).willReturn(devices);
 
             mockMvc.perform(get("/api/v1/user/device")
                             .param("role", role.name())
-                            .header(HttpHeaders.AUTHORIZATION, "Bearer token")
+                            .header(HttpHeaders.AUTHORIZATION, bearerHeader)
                             .principal(() -> userId.toString())
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
@@ -180,11 +173,10 @@ class UserControllerTest {
         @WithUserDetails
         @DisplayName("Should return 200 OK when role parameter is omitted")
         void getDevices_WithoutRoleParam() throws Exception {
-            authenticatedSetup();
             given(userService.getUserDevices(userId, null)).willReturn(Collections.emptyList());
 
             mockMvc.perform(get("/api/v1/user/device")
-                            .header(HttpHeaders.AUTHORIZATION, "Bearer token")
+                            .header(HttpHeaders.AUTHORIZATION, bearerHeader)
                             .principal(() -> userId.toString())
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
@@ -201,8 +193,6 @@ class UserControllerTest {
         @WithUserDetails
         @DisplayName("Should parse query parameters and return Map<UUID, List<SensorDataCollectionDto>>")
         void getUserTelemetry_Success() throws Exception {
-            authenticatedSetup();
-
             UUID deviceId = UUID.randomUUID();
             Map<UUID, List<SensorDataCollectionDto>> responseMap = Map.of(
                     deviceId, Collections.emptyList()
@@ -218,7 +208,7 @@ class UserControllerTest {
                             .param("page", "0")
                             .param("size", "20")
                             .param("sort", "id.timestamp,desc")
-                            .header(HttpHeaders.AUTHORIZATION, "Bearer token")
+                            .header(HttpHeaders.AUTHORIZATION, bearerHeader)
                             .principal(() -> userId.toString())
                             .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
