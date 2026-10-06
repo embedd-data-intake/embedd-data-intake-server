@@ -31,11 +31,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.BDDMockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -204,6 +201,55 @@ class DeviceControllerTest {
                     .andExpect(jsonPath("$", hasSize(0)));
 
             verify(deviceService).getDeviceAccess(deviceId, null);
+        }
+    }
+
+    @Nested
+    @DisplayName("DELETE /api/v1/device/{deviceId}/access - removeDeviceAccess")
+    class RemoveDeviceAccessTests {
+        @Test
+        @WithUserDetails
+        @DisplayName("Should return 200 OK when access is successfully revoked")
+        void removeDeviceAccess_Success() throws Exception {
+            String email = "user@example.com";
+            willDoNothing().given(deviceService).removeAccess(deviceId, email);
+            when(deviceSecurity.hasPermission(deviceId, "ADMIN")).thenReturn(true);
+
+            mockMvc.perform(delete("/api/v1/device/{deviceId}/access", deviceId)
+                            .param("emailAddress", email)
+                            .header(HttpHeaders.AUTHORIZATION, bearerHeader))
+                    .andExpect(status().isOk());
+
+            verify(deviceService).removeAccess(deviceId, email);
+        }
+
+        @Test
+        @WithUserDetails
+        @DisplayName("Should return 400 Bad Request when mandatory emailAddress parameter is missing")
+        void removeDeviceAccess_MissingParam() throws Exception {
+            when(deviceSecurity.hasPermission(deviceId, "ADMIN")).thenReturn(true);
+
+            mockMvc.perform(delete("/api/v1/device/{deviceId}/access", deviceId)
+                            .header(HttpHeaders.AUTHORIZATION, bearerHeader))
+                    .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        @WithUserDetails
+        @DisplayName("Should return 404 Not Found when target user or device access record does not exist")
+        void removeDeviceAccess_NotFound() throws Exception {
+            String email = "unknown@example.com";
+            when(deviceSecurity.hasPermission(deviceId, "ADMIN")).thenReturn(true);
+            willThrow(new NotFoundException("User access record not found"))
+                    .given(deviceService).removeAccess(deviceId, email);
+
+            mockMvc.perform(delete("/api/v1/device/{deviceId}/access", deviceId)
+                            .param("emailAddress", email)
+                            .header(HttpHeaders.AUTHORIZATION, bearerHeader))
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.message", is("User access record not found")));
+
+            verify(deviceService).removeAccess(deviceId, email);
         }
     }
 

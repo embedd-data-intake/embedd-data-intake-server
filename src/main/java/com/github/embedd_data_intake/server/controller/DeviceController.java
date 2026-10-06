@@ -67,6 +67,13 @@ public class DeviceController {
         return ResponseEntity.ok(deviceService.getDeviceAccess(deviceId, role));
     }
 
+    @DeleteMapping("/{deviceId}/access")
+    @PreAuthorize(ADMIN_PERMISSION)
+    public ResponseEntity<?> removeDeviceAccess(@PathVariable UUID deviceId, @RequestParam(name = "emailAddress", required = true) String emailAddress) {
+        deviceService.removeAccess(deviceId, emailAddress);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("{deviceId}/data")
     @PreAuthorize(READ_PERMISSION)
     public ResponseEntity<SensorDataDto> getDeviceTelemetry(
